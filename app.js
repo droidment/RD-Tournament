@@ -1554,7 +1554,11 @@ function showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId) {
             });
             
             showToast('Signed in successfully!', 'success');
-            // Will trigger onAuthStateChanged which will reload player view
+            
+            // Reload player view to show waiver form
+            setTimeout(() => {
+                showPlayerView(playerId);
+            }, 500);
         } catch (error) {
             console.error('Google auth error:', error);
             showToast('Google sign-in error: ' + error.message, 'error');
@@ -1590,7 +1594,11 @@ function showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId) {
             }
             
             showToast('Login successful!', 'success');
-            // Will trigger onAuthStateChanged which will reload player view
+            
+            // Reload player view to show waiver form
+            setTimeout(() => {
+                showPlayerView(playerId);
+            }, 500);
         } catch (error) {
             // If user not found or invalid credentials, try to create account
             if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
@@ -1611,7 +1619,11 @@ function showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId) {
                     });
                     
                     showToast('Account created successfully!', 'success');
-                    // Will trigger onAuthStateChanged which will reload player view
+                    
+                    // Reload player view to show waiver form
+                    setTimeout(() => {
+                        showPlayerView(playerId);
+                    }, 500);
                 } catch (signupError) {
                     console.error('Signup error:', signupError);
                     if (signupError.code === 'auth/email-already-in-use') {
