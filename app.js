@@ -728,17 +728,19 @@ async function showPlayerView(playerId) {
                         <div class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                             <h3 class="font-bold text-gray-800 mb-4">Tournament Waiver</h3>
                             <div class="text-sm text-gray-700 space-y-2 mb-4 max-h-60 overflow-y-auto border border-gray-200 p-4 rounded bg-white">
-                                <p class="font-semibold">LIABILITY WAIVER AND RELEASE</p>
-                                <p>I, <strong>${playerData.name}</strong> (<strong>${playerData.email}</strong>), acknowledge and agree to the following:</p>
+                                <p class="font-semibold text-center mb-3">REPUBLIC DAY TOURNAMENT WAIVER AND RELEASE OF LIABILITY</p>
+                                <p class="font-semibold mb-2">READ BEFORE SIGNING</p>
+                                <p class="mb-3">In consideration of being allowed to participate in any way in the <strong>Republic Day Volleyball and Throwball Tournament</strong>, related events and activities, the undersigned acknowledges, appreciates, and agrees that:</p>
                                 <ol class="list-decimal ml-5 space-y-2">
-                                    <li>I am voluntarily participating in the Republic Day Tournament 2026 with full knowledge of the risks involved.</li>
-                                    <li>I understand that participation in volleyball and throwball activities involves inherent risks, including but not limited to physical injury, illness, or property damage.</li>
-                                    <li>I hereby release, waive, discharge, and covenant not to sue the tournament organizers, sponsors, volunteers, and venue owners from any and all liability for any injury or damage that may occur during my participation.</li>
-                                    <li>I certify that I am in good physical condition and have no medical conditions that would prevent my safe participation.</li>
-                                    <li>I agree to follow all tournament rules and regulations and the instructions of tournament officials.</li>
-                                    <li>I grant permission for the use of photographs or videos taken during the tournament for promotional purposes.</li>
+                                    <li>The risks of injury and illness (ex: communicable diseases such as MRSA, influenza, and COVID-19) from the activities involved in this program are significant, including the potential for permanent paralysis and death, and while particular rules, equipment, and personal discipline may reduce these risks, the risks of serious injury and illness do exist; and,</li>
+                                    <li>I understand that it is my personal responsibility to inspect the playing area and determine whether or not it is safe. By participating in the tournament, I acknowledge that I have inspected the area and I take full responsibility for my decision to participate in the tournament.</li>
+                                    <li>I KNOWINGLY AND FREELY ASSUME ALL SUCH RISKS, both known and unknown, EVEN IF ARISING FROM THE NEGLIGENCE OF THE RELEASEES or others, and assume full responsibility for my participation; and,</li>
+                                    <li>I willingly agree to comply with the stated and customary terms and conditions for participation. If, however, I observe any unusual significant hazard during my presence or participation, I will remove myself from participation and bring such to the attention of the nearest official immediately; and,</li>
+                                    <li>I, for myself and on behalf of my heirs, assigns, personal representatives and next of kin, HEREBY RELEASE AND HOLD HARMLESS <strong>Republic Day Volleyball and Throwball Tournament, Katy Whackers Club, Empower Her foundation & Faith West Incorporated</strong> their officers, officials, agents, and/or employees, other participants, sponsoring agencies, sponsors, advertisers, and if applicable, owners and lessors of premises used to conduct the event ("RELEASEES"), WITH RESPECT TO ANY AND ALL INJURY, ILLNESS, DISABILITY, DEATH, or loss or damage to person or property, WHETHER ARISING FROM THE NEGLIGENCE OF THE RELEASEES OR OTHERWISE, to the fullest extent permitted by law.</li>
                                 </ol>
-                                <p class="mt-4 font-semibold">By checking the box below and submitting this form, I electronically sign this waiver with my authenticated identity.</p>
+                                <p class="mt-4 font-semibold">I HAVE READ THIS RELEASE OF LIABILITY AND ASSUMPTION OF RISK AGREEMENT, FULLY UNDERSTAND ITS TERMS, UNDERSTAND THAT I HAVE GIVEN UP SUBSTANTIAL RIGHTS BY SIGNING IT, AND SIGN IT FREELY AND VOLUNTARILY WITHOUT ANY INDUCEMENT.</p>
+                                <p class="mt-3 text-sm"><strong>Participant:</strong> ${playerData.name} (${playerData.email})</p>
+                                <p class="mt-2 font-semibold">By checking the box below and submitting this form, I electronically sign this waiver with my authenticated identity.</p>
                             </div>
 
                             <label class="flex items-start gap-3 cursor-pointer">
