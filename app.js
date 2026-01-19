@@ -384,15 +384,19 @@ async function handleEmailLogin(e) {
         await signInWithEmailAndPassword(auth, email, password);
         showToast('Login successful!', 'success');
     } catch (error) {
-        // If user not found, try to create account
-        if (error.code === 'auth/user-not-found') {
+        console.log('Login error code:', error.code); // Debug logging
+        
+        // If user not found or invalid credentials, try to create account
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             try {
                 showToast('Creating your account...', 'info');
                 await createUserWithEmailAndPassword(auth, email, password);
                 showToast('Account created successfully!', 'success');
             } catch (signupError) {
+                console.log('Signup error code:', signupError.code); // Debug logging
+                
                 if (signupError.code === 'auth/email-already-in-use') {
-                    showToast('Email already in use. Please try logging in or use a different email.', 'error');
+                    showToast('Email already in use. Try logging in with your existing password.', 'error');
                 } else if (signupError.code === 'auth/weak-password') {
                     showToast('Password is too weak. Use at least 6 characters.', 'error');
                 } else {
@@ -406,7 +410,7 @@ async function handleEmailLogin(e) {
         } else if (error.code === 'auth/too-many-requests') {
             showToast('Too many failed attempts. Please try again later.', 'error');
         } else {
-            showToast('Login error: ' + error.message, 'error');
+            showToast('Login error: ' + error.message + ' (Code: ' + error.code + ')', 'error');
         }
     }
 }
