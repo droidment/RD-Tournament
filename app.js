@@ -1257,7 +1257,6 @@ async function showOrganizerDashboard() {
         });
     }
 }
-}
 
 // ============================================
 // UTILITY FUNCTIONS
