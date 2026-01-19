@@ -2040,6 +2040,11 @@ async function showManageOrganizersModal() {
             }
         });
     });
+    
+    } catch (error) {
+        console.error('Error in showManageOrganizersModal:', error);
+        showToast('Error loading organizers: ' + error.message, 'error');
+    }
 }
 
 // ============================================
