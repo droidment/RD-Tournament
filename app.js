@@ -40,6 +40,12 @@ function isFirebaseConfigured() {
 
 // Check if user is authorized organizer
 async function isAuthorizedOrganizer(email) {
+    // Defensive check - ensure email is valid
+    if (!email || typeof email !== 'string') {
+        console.warn('isAuthorizedOrganizer called with invalid email:', email);
+        return false;
+    }
+    
     // Check hardcoded list first
     if (AUTHORIZED_ORGANIZERS.map(e => e.toLowerCase()).includes(email.toLowerCase())) {
         return true;
@@ -53,7 +59,7 @@ async function isAuthorizedOrganizer(email) {
         if (organizersSnapshot.exists()) {
             const organizers = organizersSnapshot.val();
             return Object.values(organizers).some(org => 
-                org.email.toLowerCase() === email.toLowerCase()
+                org.email && org.email.toLowerCase() === email.toLowerCase()
             );
         }
     } catch (error) {
@@ -186,6 +192,14 @@ async function handleAuthUser(user) {
     }
     
     try {
+        // Validate user has email
+        if (!user.email) {
+            console.error('User authenticated but has no email:', user);
+            showToast('Authentication error: No email found. Please try logging in again.', 'error');
+            await signOut(auth);
+            return;
+        }
+        
         // Get user role from database
         const userRef = ref(database, `users/${user.uid}`);
         const userSnapshot = await get(userRef);
@@ -632,9 +646,9 @@ async function showCaptainView() {
     const players = teamData.players || {};
     
     // Check if captain is already registered as a player
-    const captainEmail = teamData.captain.email.toLowerCase();
+    const captainEmail = teamData.captain && teamData.captain.email ? teamData.captain.email.toLowerCase() : '';
     const captainAsPlayer = Object.entries(players).find(([_, p]) => 
-        p.email.toLowerCase() === captainEmail
+        p.email && captainEmail && p.email.toLowerCase() === captainEmail
     );
     
     document.getElementById('captain-view').innerHTML = `
@@ -1090,7 +1104,10 @@ async function showPlayerView(playerId) {
     
     // Check if player is authenticated
     const currentAuthUser = auth.currentUser;
-    const isPlayerAuthenticated = currentAuthUser && currentAuthUser.email.toLowerCase() === playerData.email.toLowerCase();
+    const isPlayerAuthenticated = currentAuthUser && 
+                                  currentAuthUser.email && 
+                                  playerData.email && 
+                                  currentAuthUser.email.toLowerCase() === playerData.email.toLowerCase();
     
     if (!isPlayerAuthenticated) {
         showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId);
@@ -1114,6 +1131,14 @@ async function showPlayerView(playerId) {
                                 <strong>Lunch Choice:</strong> ${getLunchChoiceDisplay(playerData.lunchChoice)}
                             </p>
                         </div>
+                        
+                        ${teamData.leagueId === 'masters-volleyball' && playerData.ageVerified ? `
+                            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                                <p class="text-sm text-gray-700">
+                                    <strong class="text-yellow-800">✓ Age Verified:</strong> 45+ League
+                                </p>
+                            </div>
+                        ` : ''}
                         
                         ${playerData.waiverFullName ? `
                             <div class="bg-gray-50 p-4 rounded-lg">
@@ -1192,6 +1217,16 @@ async function showPlayerView(playerId) {
                                     I certify that the name and signature above are mine. I have read and agree to all waiver terms. I understand this is a legally binding electronic signature.
                                 </span>
                             </label>
+                            
+                            ${teamData.leagueId === 'masters-volleyball' ? `
+                                <label class="flex items-start gap-3 cursor-pointer mt-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                                    <input type="checkbox" id="age-verification-checkbox" class="mt-1 w-5 h-5 text-yellow-500" required>
+                                    <span class="text-sm text-gray-700">
+                                        <strong class="text-yellow-800">45+ League Age Verification:</strong><br>
+                                        I certify that I am 45 years of age or older. I understand that participation in the 45+ league is restricted to players who meet this age requirement.
+                                    </span>
+                                </label>
+                            ` : ''}
                         </div>
 
                         <div class="bg-gray-50 p-4 sm:p-6 rounded-lg">
@@ -1338,6 +1373,10 @@ async function showPlayerView(playerId) {
             const waiverSigned = document.getElementById('waiver-checkbox').checked;
             const lunchChoice = document.querySelector('input[name="lunch"]:checked').value;
             
+            // Check if age verification is required (45+ league)
+            const ageVerificationCheckbox = document.getElementById('age-verification-checkbox');
+            const ageVerified = ageVerificationCheckbox ? ageVerificationCheckbox.checked : true;
+            
             // Validation
             if (!fullName) {
                 showToast('Please enter your full legal name', 'error');
@@ -1350,7 +1389,12 @@ async function showPlayerView(playerId) {
             }
             
             if (!waiverSigned) {
-                showToast('Please check the agreement box to continue', 'error');
+                showToast('Please check the waiver agreement box to continue', 'error');
+                return;
+            }
+            
+            if (ageVerificationCheckbox && !ageVerified) {
+                showToast('Please confirm you are 45 years or older to participate in the 45+ league', 'error');
                 return;
             }
             
@@ -1358,8 +1402,8 @@ async function showPlayerView(playerId) {
                 // Convert signature to base64
                 const signatureData = canvas.toDataURL('image/png');
                 
-                // Record authenticated waiver signature
-                await update(ref(database, `teams/${playerTeamId}/players/${playerId}`), {
+                // Prepare data to save
+                const playerUpdateData = {
                     waiverSigned: true,
                     waiverSignedBy: currentAuthUser.email,
                     waiverSignedAt: new Date().toISOString(),
@@ -1367,7 +1411,16 @@ async function showPlayerView(playerId) {
                     waiverSignature: signatureData,
                     lunchChoice: lunchChoice,
                     submittedAt: new Date().toISOString()
-                });
+                };
+                
+                // Add age verification if applicable
+                if (ageVerificationCheckbox) {
+                    playerUpdateData.ageVerified = true;
+                    playerUpdateData.ageVerifiedAt = new Date().toISOString();
+                }
+                
+                // Record authenticated waiver signature
+                await update(ref(database, `teams/${playerTeamId}/players/${playerId}`), playerUpdateData);
                 
                 showToast('Registration submitted successfully!', 'success');
                 setTimeout(() => {
@@ -1522,7 +1575,13 @@ function showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId) {
         try {
             const result = await signInWithPopup(auth, provider);
             
-            // Check if email matches
+            // Check if emails exist and match
+            if (!result.user.email || !playerData.email) {
+                await signOut(auth);
+                showToast('Authentication error: Email not found', 'error');
+                return;
+            }
+            
             if (result.user.email.toLowerCase() !== playerData.email.toLowerCase()) {
                 await signOut(auth);
                 showToast(`Please use Google account with email: ${playerData.email}`, 'error');
