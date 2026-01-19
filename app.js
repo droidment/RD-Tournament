@@ -1274,19 +1274,6 @@ async function showOrganizerDashboard() {
                                         </div>
                                     </div>
                                 `;
-                                                    <div class="font-semibold">${lunchCount}/${playerCount}</div>
-                                                    <div class="text-gray-600">Lunch</div>
-                                                </div>
-                                                <div class="bg-gray-50 p-2 rounded text-center col-span-2 sm:col-span-1">
-                                                    <div class="font-semibold">${Math.round((waiverCount / playerCount) * 100)}%</div>
-                                                    <div class="text-gray-600">Complete</div>
-                                                </div>
-                                            </div>
-                                        ` : `
-                                            <p class="text-xs sm:text-sm text-gray-500 mt-2">No players added yet</p>
-                                        `}
-                                    </div>
-                                `;
                             }).join('')}
                         </div>
                     </div>
