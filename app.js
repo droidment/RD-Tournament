@@ -139,6 +139,9 @@ function showRoleSwitcher(currentRole, captainSnapshot) {
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', async function() {
+    // Detect WhatsApp browser
+    const isWhatsApp = /whatsapp/i.test(navigator.userAgent);
+    
     if (!isFirebaseConfigured()) {
         document.getElementById('loading-screen').classList.add('hidden');
         document.getElementById('config-error').classList.remove('hidden');
@@ -172,8 +175,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     } catch (error) {
         console.error('Firebase initialization error:', error);
-        showToast('Error initializing app: ' + error.message, 'error');
+        
         document.getElementById('loading-screen').classList.add('hidden');
+        
+        // Show WhatsApp-specific message if detected
+        if (isWhatsApp) {
+            showWhatsAppBrowserError();
+        } else {
+            showToast('Error initializing app: ' + error.message, 'error');
+        }
     }
 });
 
@@ -311,6 +321,64 @@ async function handleAuthUser(user) {
 // ============================================
 // LOGIN VIEW
 // ============================================
+function showWhatsAppBrowserError() {
+    hideAllViews();
+    
+    // Get current URL to copy
+    const currentUrl = window.location.href;
+    
+    document.getElementById('login-view').classList.remove('hidden');
+    document.getElementById('login-view').innerHTML = `
+        <div class="max-w-md mx-auto mt-8 fade-in">
+            <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8">
+                <div class="text-center mb-6">
+                    <div class="text-4xl mb-3">⚠️</div>
+                    <h2 class="text-2xl font-bold text-orange-600 mb-2">WhatsApp Browser Not Supported</h2>
+                    <p class="text-sm text-gray-600">Please open this link in your regular browser</p>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-gray-700 mb-3">
+                        WhatsApp's built-in browser blocks certain features needed for registration.
+                    </p>
+                    <p class="text-sm text-gray-700 font-semibold">
+                        Please open this link in:
+                    </p>
+                    <ul class="text-sm text-gray-700 mt-2 space-y-1 list-disc list-inside">
+                        <li>Chrome</li>
+                        <li>Safari</li>
+                        <li>Firefox</li>
+                        <li>Any other browser</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="navigator.clipboard.writeText('${currentUrl}').then(() => alert('Link copied! Now paste it in your browser.'))" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
+                        📋 Copy Link
+                    </button>
+                    
+                    <button onclick="window.location.href = '${currentUrl}'" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition">
+                        🔄 Try Opening Anyway
+                    </button>
+                </div>
+
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <p class="text-xs text-gray-600 font-semibold mb-2">How to open in browser:</p>
+                    <ol class="text-xs text-gray-600 space-y-2 list-decimal list-inside">
+                        <li>Tap the three dots (⋮) at the top of WhatsApp</li>
+                        <li>Select "Open in browser" or "Open in Chrome/Safari"</li>
+                        <li>Or copy the link and paste it in your browser</li>
+                    </ol>
+                </div>
+
+                <div class="text-xs text-gray-500 text-center mt-4">
+                    <p>Need help? Contact your team captain</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function showLoginView() {
     hideAllViews();
     document.getElementById('login-view').classList.remove('hidden');
