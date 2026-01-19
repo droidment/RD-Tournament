@@ -90,6 +90,12 @@ async function handleAuthUser(user) {
     document.getElementById('user-email').textContent = user.email;
     document.getElementById('user-info').classList.remove('hidden');
     
+    // Attach logout button event listener
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+    
     try {
         // Get user role from database
         const userRef = ref(database, `users/${user.uid}`);
@@ -528,13 +534,6 @@ async function showCaptainView() {
                 showCaptainView(); // Refresh view
             }
         });
-    });
-    
-    // Real-time updates
-    onValue(teamRef, (snapshot) => {
-        if (snapshot.exists()) {
-            showCaptainView(); // Refresh when data changes
-        }
     });
 }
 
@@ -1250,14 +1249,14 @@ async function showOrganizerDashboard() {
     `;
     
     // Add More Teams button
-    document.getElementById('add-more-teams-btn').addEventListener('click', () => {
-        showSetupPage();
-    });
-    
-    // Real-time updates
-    onValue(ref(database, 'teams'), () => {
-        showOrganizerDashboard(); // Refresh when data changes
-    });
+    const addMoreTeamsBtn = document.getElementById('add-more-teams-btn');
+    if (addMoreTeamsBtn) {
+        addMoreTeamsBtn.addEventListener('click', () => {
+            console.log('Add More Teams clicked');
+            showSetupPage();
+        });
+    }
+}
 }
 
 // ============================================
