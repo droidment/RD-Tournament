@@ -1437,6 +1437,8 @@ async function showPlayerView(playerId) {
 // PLAYER AUTHENTICATION SCREEN
 // ============================================
 function showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId) {
+    const hasEmail = playerData.email && playerData.email.trim() !== '';
+    
     document.getElementById('player-view').innerHTML = `
         <div class="max-w-md mx-auto mt-8 fade-in">
             <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8">
@@ -1448,144 +1450,100 @@ function showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId) {
 
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                     <p class="text-sm text-gray-700"><strong>Player:</strong> ${playerData.name}</p>
-                    <p class="text-sm text-gray-700"><strong>Email:</strong> ${playerData.email}</p>
                     <p class="text-sm text-gray-700"><strong>Team:</strong> ${teamData.name}</p>
+                    ${hasEmail ? `<p class="text-sm text-gray-700"><strong>Email:</strong> ${playerData.email}</p>` : ''}
                 </div>
 
                 <div class="mb-6">
-                    <div class="flex gap-2 mb-4">
-                        <button id="show-login-tab" class="flex-1 py-2 px-4 rounded-lg font-semibold bg-orange-500 text-white">
-                            Login
-                        </button>
-                        <button id="show-signup-tab" class="flex-1 py-2 px-4 rounded-lg font-semibold bg-gray-200 text-gray-700">
-                            Sign Up
-                        </button>
-                    </div>
+                    <!-- Google Sign-In Option (Always Available) -->
+                    <button id="google-auth-btn" class="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2 mb-4">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Sign in with Google
+                    </button>
 
-                    <!-- Login Form -->
-                    <form id="player-login-form" class="space-y-4">
+                    <div class="text-center text-gray-500 text-sm mb-4">or</div>
+
+                    <!-- Email/Password Form -->
+                    <form id="player-email-auth-form" class="space-y-4">
+                        ${!hasEmail ? `
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                                <p class="text-xs text-yellow-800">
+                                    <strong>Note:</strong> Your captain didn't provide your email. Please enter it below.
+                                </p>
+                            </div>
+                        ` : ''}
+                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" id="player-login-email" value="${playerData.email}" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Your Email Address</label>
+                            <input 
+                                type="email" 
+                                id="player-auth-email" 
+                                value="${hasEmail ? playerData.email : ''}" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none ${hasEmail ? 'bg-gray-100' : ''}" 
+                                ${hasEmail ? 'readonly' : 'required'}
+                                placeholder="${hasEmail ? '' : 'your@email.com'}"
+                            >
+                            ${hasEmail ? '<p class="text-xs text-gray-500 mt-1">This is your registered email</p>' : '<p class="text-xs text-gray-500 mt-1">Enter your email address to continue</p>'}
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                            <input type="password" id="player-login-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none" required placeholder="Enter your password">
+                            <input 
+                                type="password" 
+                                id="player-auth-password" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none" 
+                                required 
+                                placeholder="Min 6 characters"
+                                minlength="6"
+                            >
+                            <p class="text-xs text-gray-500 mt-1">
+                                ${hasEmail ? 'Enter your password, or create one if this is your first time' : 'Create a password (min 6 characters)'}
+                            </p>
                         </div>
 
                         <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
-                            Login to Sign Waiver
-                        </button>
-                    </form>
-
-                    <!-- Signup Form -->
-                    <form id="player-signup-form" class="space-y-4 hidden">
-                        <div>
-                            <button type="button" id="google-signup-btn" class="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2 mb-4">
-                                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                                </svg>
-                                Sign up with Google
-                            </button>
-                        </div>
-
-                        <div class="text-center text-gray-500 text-sm">or</div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                            <input type="text" id="player-signup-name" value="${playerData.name}" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100" readonly>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" id="player-signup-email" value="${playerData.email}" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100" readonly>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Create Password</label>
-                            <input type="password" id="player-signup-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none" required placeholder="Min 6 characters" minlength="6">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                            <input type="password" id="player-signup-confirm" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none" required placeholder="Re-enter password">
-                        </div>
-
-                        <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
-                            Create Account & Continue
+                            ${hasEmail ? 'Login / Sign Up' : 'Continue with Email'}
                         </button>
                     </form>
                 </div>
 
-                <div class="text-xs text-gray-500 text-center">
+                <div class="text-xs text-gray-500 text-center space-y-1">
                     <p>🔒 Your email is used to verify your identity for legal waiver purposes.</p>
+                    <p>First time? We'll create your account automatically!</p>
                 </div>
             </div>
         </div>
     `;
 
-    // Tab switching
-    document.getElementById('show-login-tab').addEventListener('click', function() {
-        this.classList.add('bg-orange-500', 'text-white');
-        this.classList.remove('bg-gray-200', 'text-gray-700');
-        document.getElementById('show-signup-tab').classList.remove('bg-orange-500', 'text-white');
-        document.getElementById('show-signup-tab').classList.add('bg-gray-200', 'text-gray-700');
-        document.getElementById('player-login-form').classList.remove('hidden');
-        document.getElementById('player-signup-form').classList.add('hidden');
-    });
-
-    document.getElementById('show-signup-tab').addEventListener('click', function() {
-        this.classList.add('bg-orange-500', 'text-white');
-        this.classList.remove('bg-gray-200', 'text-gray-700');
-        document.getElementById('show-login-tab').classList.remove('bg-orange-500', 'text-white');
-        document.getElementById('show-login-tab').classList.add('bg-gray-200', 'text-gray-700');
-        document.getElementById('player-signup-form').classList.remove('hidden');
-        document.getElementById('player-login-form').classList.add('hidden');
-    });
-
-    // Login form handler
-    document.getElementById('player-login-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('player-login-email').value;
-        const password = document.getElementById('player-login-password').value;
-        
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            showToast('Login successful!', 'success');
-            // Will trigger onAuthStateChanged which will reload player view
-        } catch (error) {
-            if (error.code === 'auth/user-not-found') {
-                showToast('No account found. Please sign up first.', 'error');
-                document.getElementById('show-signup-tab').click();
-            } else if (error.code === 'auth/wrong-password') {
-                showToast('Invalid password', 'error');
-            } else {
-                showToast('Login error: ' + error.message, 'error');
-            }
-        }
-    });
-
-    // Google signup handler
-    document.getElementById('google-signup-btn').addEventListener('click', async function() {
+    // Google Auth Handler
+    document.getElementById('google-auth-btn').addEventListener('click', async function() {
         const provider = new GoogleAuthProvider();
         try {
             const result = await signInWithPopup(auth, provider);
             
-            // Check if emails exist and match
-            if (!result.user.email || !playerData.email) {
+            if (!result.user.email) {
                 await signOut(auth);
-                showToast('Authentication error: Email not found', 'error');
+                showToast('Could not get email from Google account', 'error');
                 return;
             }
             
-            if (result.user.email.toLowerCase() !== playerData.email.toLowerCase()) {
-                await signOut(auth);
-                showToast(`Please use Google account with email: ${playerData.email}`, 'error');
-                return;
+            // Update player email if not set
+            if (!hasEmail) {
+                await update(ref(database, `teams/${playerTeamId}/players/${playerId}`), {
+                    email: result.user.email
+                });
+            } else {
+                // Verify email matches if email was already set
+                if (result.user.email.toLowerCase() !== playerData.email.toLowerCase()) {
+                    await signOut(auth);
+                    showToast(`Please use Google account with email: ${playerData.email}`, 'error');
+                    return;
+                }
             }
             
             // Create player user record
@@ -1595,42 +1553,81 @@ function showPlayerAuthScreen(playerId, playerData, teamData, playerTeamId) {
                 name: playerData.name
             });
             
-            showToast('Account created successfully!', 'success');
+            showToast('Signed in successfully!', 'success');
             // Will trigger onAuthStateChanged which will reload player view
         } catch (error) {
-            showToast('Google signup error: ' + error.message, 'error');
+            console.error('Google auth error:', error);
+            showToast('Google sign-in error: ' + error.message, 'error');
         }
     });
 
-    // Signup form handler
-    document.getElementById('player-signup-form').addEventListener('submit', async function(e) {
+    // Email/Password Auth Handler
+    document.getElementById('player-email-auth-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const password = document.getElementById('player-signup-password').value;
-        const confirm = document.getElementById('player-signup-confirm').value;
         
-        if (password !== confirm) {
-            showToast('Passwords do not match!', 'error');
+        const email = document.getElementById('player-auth-email').value.trim().toLowerCase();
+        const password = document.getElementById('player-auth-password').value;
+        
+        if (!email) {
+            showToast('Please enter your email address', 'error');
             return;
         }
-
+        
+        if (password.length < 6) {
+            showToast('Password must be at least 6 characters', 'error');
+            return;
+        }
+        
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, playerData.email, password);
+            // Try to sign in first
+            await signInWithEmailAndPassword(auth, email, password);
             
-            // Create player user record
-            await set(ref(database, `users/${userCredential.user.uid}`), {
-                email: playerData.email,
-                role: 'player',
-                name: playerData.name
-            });
+            // Update player email if not set
+            if (!hasEmail) {
+                await update(ref(database, `teams/${playerTeamId}/players/${playerId}`), {
+                    email: email
+                });
+            }
             
-            showToast('Account created successfully!', 'success');
+            showToast('Login successful!', 'success');
             // Will trigger onAuthStateChanged which will reload player view
         } catch (error) {
-            if (error.code === 'auth/email-already-in-use') {
-                showToast('Account already exists. Please login instead.', 'error');
-                document.getElementById('show-login-tab').click();
+            // If user not found or invalid credentials, try to create account
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                try {
+                    showToast('Creating your account...', 'info');
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // Update player email in database
+                    await update(ref(database, `teams/${playerTeamId}/players/${playerId}`), {
+                        email: email
+                    });
+                    
+                    // Create player user record
+                    await set(ref(database, `users/${userCredential.user.uid}`), {
+                        email: email,
+                        role: 'player',
+                        name: playerData.name
+                    });
+                    
+                    showToast('Account created successfully!', 'success');
+                    // Will trigger onAuthStateChanged which will reload player view
+                } catch (signupError) {
+                    console.error('Signup error:', signupError);
+                    if (signupError.code === 'auth/email-already-in-use') {
+                        showToast('Email already in use. Please try logging in with your password.', 'error');
+                    } else if (signupError.code === 'auth/weak-password') {
+                        showToast('Password is too weak. Use at least 6 characters.', 'error');
+                    } else {
+                        showToast('Error: ' + signupError.message, 'error');
+                    }
+                }
+            } else if (error.code === 'auth/wrong-password') {
+                showToast('Incorrect password. Please try again.', 'error');
+            } else if (error.code === 'auth/invalid-email') {
+                showToast('Invalid email format', 'error');
             } else {
-                showToast('Signup error: ' + error.message, 'error');
+                showToast('Authentication error: ' + error.message, 'error');
             }
         }
     });
