@@ -1229,14 +1229,22 @@ async function showOrganizerDashboard() {
     document.getElementById('organizer-view').innerHTML = `
         <div class="space-y-4 sm:space-y-6 fade-in">
             <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Organizer Dashboard</h2>
                         <p class="text-sm sm:text-base text-gray-600">Republic Day Tournament 2026 - Overview</p>
                     </div>
-                    <button id="add-more-teams-btn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 text-sm">
-                        + Add More Teams
-                    </button>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="message-captains-btn" class="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 text-xs sm:text-sm whitespace-nowrap">
+                            📱 Message All Captains
+                        </button>
+                        <button id="message-players-btn" class="bg-purple-500 text-white px-3 py-2 rounded-lg hover:bg-purple-600 text-xs sm:text-sm whitespace-nowrap">
+                            📱 Message All Players
+                        </button>
+                        <button id="add-more-teams-btn" class="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 text-xs sm:text-sm whitespace-nowrap">
+                            + Add More Teams
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1372,6 +1380,22 @@ async function showOrganizerDashboard() {
         </div>
     `;
     
+    // Message All Captains button
+    const messageCaptainsBtn = document.getElementById('message-captains-btn');
+    if (messageCaptainsBtn) {
+        messageCaptainsBtn.addEventListener('click', () => {
+            messageAllCaptains(teams);
+        });
+    }
+    
+    // Message All Players button
+    const messagePlayersBtn = document.getElementById('message-players-btn');
+    if (messagePlayersBtn) {
+        messagePlayersBtn.addEventListener('click', () => {
+            messageAllPlayers(teams);
+        });
+    }
+    
     // Add More Teams button
     const addMoreTeamsBtn = document.getElementById('add-more-teams-btn');
     if (addMoreTeamsBtn) {
@@ -1406,6 +1430,246 @@ async function showOrganizerDashboard() {
                 await deleteTeam(teamId);
             }
         });
+    });
+}
+
+// ============================================
+// MESSAGING FUNCTIONS (FOR ORGANIZER)
+// ============================================
+
+function messageAllCaptains(teams) {
+    const captains = [];
+    
+    Object.values(teams).forEach(team => {
+        captains.push({
+            name: team.captain.name,
+            phone: team.captain.phone,
+            team: team.name
+        });
+    });
+    
+    if (captains.length === 0) {
+        showToast('No captains to message', 'error');
+        return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Message All Captains (${captains.length})</h3>
+            
+            <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-gray-700 mb-2">
+                    <strong>This will open WhatsApp for each captain individually.</strong>
+                </p>
+                <p class="text-xs text-gray-600">
+                    App Link: <code class="bg-white px-2 py-1 rounded">https://rd-tournament.vercel.app</code>
+                </p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Message Template:</label>
+                <textarea id="captain-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-48 text-sm" placeholder="Customize your message...">Hi {name}!
+
+This is the organizer of Republic Day Tournament 2026 🏐
+
+*IMPORTANT REMINDER:*
+
+🔗 *App Link:* https://rd-tournament.vercel.app
+
+Please login to the app using your registered email to:
+✅ Add your players to team "{team}"
+✅ Share registration links with them
+✅ Track their waiver completion
+
+*What your players need to do:*
+1. Click their registration link
+2. Sign the waiver
+3. Select lunch preference (Veg/Non-Veg)
+
+Tournament Date: *January 26, 2026*
+
+Questions? Reply to this message!
+
+Thank you! 🎉</textarea>
+            </div>
+            
+            <div class="space-y-2 mb-4 max-h-48 overflow-y-auto">
+                <p class="text-sm font-medium text-gray-700">Captains List:</p>
+                ${captains.map((c, i) => `
+                    <div class="text-xs p-2 bg-gray-50 rounded flex justify-between">
+                        <span>${i+1}. ${c.name} - ${c.team}</span>
+                        <span class="text-gray-500">${c.phone}</span>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="flex gap-3">
+                <button class="close-modal flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400">
+                    Cancel
+                </button>
+                <button id="send-to-captains" class="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">
+                    Open WhatsApp for Each Captain
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+    
+    modal.querySelector('#send-to-captains').addEventListener('click', () => {
+        const messageTemplate = document.getElementById('captain-message').value;
+        let successCount = 0;
+        
+        captains.forEach((captain, index) => {
+            setTimeout(() => {
+                const personalizedMessage = messageTemplate
+                    .replace('{name}', captain.name)
+                    .replace('{team}', captain.team);
+                
+                const whatsappUrl = `https://wa.me/${captain.phone.replace(/\D/g, '')}?text=${encodeURIComponent(personalizedMessage)}`;
+                window.open(whatsappUrl, '_blank');
+                successCount++;
+                
+                if (successCount === captains.length) {
+                    showToast(`Opened WhatsApp for all ${captains.length} captains!`, 'success');
+                }
+            }, index * 1000); // 1 second delay between each
+        });
+        
+        modal.remove();
+    });
+}
+
+function messageAllPlayers(teams) {
+    const players = [];
+    
+    Object.values(teams).forEach(team => {
+        if (team.players) {
+            Object.values(team.players).forEach(player => {
+                players.push({
+                    name: player.name,
+                    phone: player.phone,
+                    email: player.email,
+                    team: team.name,
+                    waiverSigned: player.waiverSigned,
+                    lunchChoice: player.lunchChoice
+                });
+            });
+        }
+    });
+    
+    if (players.length === 0) {
+        showToast('No players to message', 'error');
+        return;
+    }
+    
+    // Filter options
+    const pendingWaiverPlayers = players.filter(p => !p.waiverSigned);
+    const pendingLunchPlayers = players.filter(p => !p.lunchChoice);
+    const completePlayers = players.filter(p => p.waiverSigned && p.lunchChoice);
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Message Players</h3>
+            
+            <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                <p class="text-sm text-gray-700 mb-2">
+                    <strong>Select which players to message:</strong>
+                </p>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="player-filter" value="all" checked class="w-4 h-4">
+                        <span class="text-sm">All Players (${players.length})</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="player-filter" value="pending-waiver" class="w-4 h-4">
+                        <span class="text-sm">Only Pending Waiver (${pendingWaiverPlayers.length})</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="player-filter" value="pending-lunch" class="w-4 h-4">
+                        <span class="text-sm">Only Pending Lunch (${pendingLunchPlayers.length})</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="player-filter" value="complete" class="w-4 h-4">
+                        <span class="text-sm">Only Completed (${completePlayers.length})</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Message Template:</label>
+                <textarea id="player-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-48 text-sm">Hi {name}!
+
+Reminder for Republic Day Tournament 2026 🏐
+
+*Team:* {team}
+
+🔗 *App Link:* https://rd-tournament.vercel.app
+
+*Please complete your registration ASAP:*
+✅ Sign the liability waiver
+✅ Select lunch preference (Veg/Non-Veg)
+
+*Tournament Date:* January 26, 2026
+
+We need your registration to finalize catering and logistics!
+
+See you at the tournament! 🎉</textarea>
+            </div>
+            
+            <div class="flex gap-3">
+                <button class="close-modal flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400">
+                    Cancel
+                </button>
+                <button id="send-to-players" class="flex-1 bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600">
+                    Open WhatsApp for Selected Players
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+    
+    modal.querySelector('#send-to-players').addEventListener('click', () => {
+        const messageTemplate = document.getElementById('player-message').value;
+        const filter = document.querySelector('input[name="player-filter"]:checked').value;
+        
+        let selectedPlayers = players;
+        if (filter === 'pending-waiver') selectedPlayers = pendingWaiverPlayers;
+        if (filter === 'pending-lunch') selectedPlayers = pendingLunchPlayers;
+        if (filter === 'complete') selectedPlayers = completePlayers;
+        
+        if (selectedPlayers.length === 0) {
+            showToast('No players match the selected filter', 'error');
+            return;
+        }
+        
+        let successCount = 0;
+        selectedPlayers.forEach((player, index) => {
+            setTimeout(() => {
+                const personalizedMessage = messageTemplate
+                    .replace('{name}', player.name)
+                    .replace('{team}', player.team);
+                
+                const whatsappUrl = `https://wa.me/${player.phone.replace(/\D/g, '')}?text=${encodeURIComponent(personalizedMessage)}`;
+                window.open(whatsappUrl, '_blank');
+                successCount++;
+                
+                if (successCount === selectedPlayers.length) {
+                    showToast(`Opened WhatsApp for ${selectedPlayers.length} players!`, 'success');
+                }
+            }, index * 1000); // 1 second delay between each
+        });
+        
+        modal.remove();
     });
 }
 
