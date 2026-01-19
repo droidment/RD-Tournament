@@ -342,22 +342,43 @@ function addCaptainForm() {
 async function handleSetupSubmit(e) {
     e.preventDefault();
     
-    const orgEmail = document.getElementById('org-email').value;
-    const orgPassword = document.getElementById('org-password').value;
+    const submitBtn = document.getElementById('submit-setup-btn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Setting up...';
+    }
     
     try {
         showToast('Setting up tournament...', 'info');
         
-        // Create organizer account
-        const orgUserCredential = await createUserWithEmailAndPassword(auth, orgEmail, orgPassword);
-        await set(ref(database, `users/${orgUserCredential.user.uid}`), {
-            email: orgEmail,
-            role: 'organizer',
-            createdAt: new Date().toISOString()
-        });
+        // Check if this is from modal (has org-email) or setup page (no org-email)
+        const orgEmailInput = document.getElementById('org-email');
         
-        // Get all captain forms
-        const captainForms = document.querySelectorAll('#captains-container > div');
+        if (orgEmailInput) {
+            // From modal - need to create organizer account first
+            const orgEmail = orgEmailInput.value;
+            const orgPassword = document.getElementById('org-password').value;
+            
+            // Create organizer account
+            const orgUserCredential = await createUserWithEmailAndPassword(auth, orgEmail, orgPassword);
+            await set(ref(database, `users/${orgUserCredential.user.uid}`), {
+                email: orgEmail,
+                role: 'organizer',
+                createdAt: new Date().toISOString()
+            });
+        }
+        
+        // Get all captain forms (works for both modal and setup page)
+        const captainForms = document.querySelectorAll('.captain-form');
+        
+        if (captainForms.length === 0) {
+            showToast('Please add at least one team', 'error');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Complete Setup';
+            }
+            return;
+        }
         
         for (const form of captainForms) {
             const leagueId = form.querySelector('.captain-league').value;
@@ -1213,6 +1234,7 @@ async function showOrganizerDashboard() {
                                                 <p class="text-xs sm:text-sm text-gray-600">
                                                     Captain: ${team.captain.name} (${team.captain.email})
                                                 </p>
+                                                <p class="text-xs text-gray-500">Phone: ${team.captain.phone}</p>
                                             </div>
                                             <div class="text-right ml-2">
                                                 <div class="text-base sm:text-lg font-bold text-gray-800">${playerCount}</div>
@@ -1221,12 +1243,37 @@ async function showOrganizerDashboard() {
                                         </div>
                                         
                                         ${playerCount > 0 ? `
-                                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 text-xs">
+                                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 text-xs mb-3">
                                                 <div class="bg-gray-50 p-2 rounded text-center">
                                                     <div class="font-semibold">${waiverCount}/${playerCount}</div>
                                                     <div class="text-gray-600">Waivers</div>
                                                 </div>
                                                 <div class="bg-gray-50 p-2 rounded text-center">
+                                                    <div class="font-semibold">${lunchCount}/${playerCount}</div>
+                                                    <div class="text-gray-600">Lunch</div>
+                                                </div>
+                                                <div class="bg-gray-50 p-2 rounded text-center col-span-2 sm:col-span-1">
+                                                    <div class="font-semibold">${Math.round((waiverCount / playerCount) * 100)}%</div>
+                                                    <div class="text-gray-600">Complete</div>
+                                                </div>
+                                            </div>
+                                        ` : `
+                                            <p class="text-xs sm:text-sm text-gray-500 mt-2 mb-3">No players added yet</p>
+                                        `}
+                                        
+                                        <div class="flex flex-wrap gap-2">
+                                            <button class="view-players-btn bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600" data-team-id="${team.id}">
+                                                👥 View Players
+                                            </button>
+                                            <button class="edit-team-btn bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600" data-team-id="${team.id}">
+                                                ✏️ Edit
+                                            </button>
+                                            <button class="delete-team-btn bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600" data-team-id="${team.id}">
+                                                🗑️ Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
                                                     <div class="font-semibold">${lunchCount}/${playerCount}</div>
                                                     <div class="text-gray-600">Lunch</div>
                                                 </div>
@@ -1255,6 +1302,231 @@ async function showOrganizerDashboard() {
             console.log('Add More Teams clicked');
             showSetupPage();
         });
+    }
+    
+    // View Players buttons
+    document.querySelectorAll('.view-players-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const teamId = e.target.dataset.teamId;
+            showTeamPlayersModal(teamId, teams[teamId]);
+        });
+    });
+    
+    // Edit Team buttons
+    document.querySelectorAll('.edit-team-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const teamId = e.target.dataset.teamId;
+            showEditTeamModal(teamId, teams[teamId]);
+        });
+    });
+    
+    // Delete Team buttons
+    document.querySelectorAll('.delete-team-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const teamId = e.target.dataset.teamId;
+            const team = teams[teamId];
+            if (confirm(`Are you sure you want to delete "${team.name}"? This will also delete all players and cannot be undone.`)) {
+                await deleteTeam(teamId);
+            }
+        });
+    });
+}
+
+// ============================================
+// TEAM MANAGEMENT FUNCTIONS (FOR ORGANIZER)
+// ============================================
+
+function showTeamPlayersModal(teamId, team) {
+    const players = team.players || {};
+    const playersList = Object.entries(players);
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">${team.name} - Players</h3>
+                    <p class="text-sm text-gray-600">Captain: ${team.captain.name}</p>
+                </div>
+                <button class="close-modal text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="p-6">
+                ${playersList.length === 0 ? `
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No players added yet</p>
+                    </div>
+                ` : `
+                    <div class="space-y-3">
+                        ${playersList.map(([playerId, player]) => `
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-800">${player.name}</h4>
+                                        <p class="text-sm text-gray-600">${player.email}</p>
+                                        <p class="text-sm text-gray-600">${player.phone}</p>
+                                        
+                                        <div class="mt-2 flex flex-wrap gap-3 text-xs">
+                                            <div class="flex items-center gap-1">
+                                                ${player.waiverSigned ? 
+                                                    '<span class="text-green-600">✓ Waiver Signed</span>' : 
+                                                    '<span class="text-red-600">✗ Waiver Pending</span>'
+                                                }
+                                            </div>
+                                            ${player.waiverSigned ? `
+                                                <div class="text-gray-500">
+                                                    Signed: ${new Date(player.waiverSignedAt).toLocaleDateString()}
+                                                </div>
+                                            ` : ''}
+                                            <div class="flex items-center gap-1">
+                                                ${player.lunchChoice ? 
+                                                    `<span class="text-green-600">🍽️ ${player.lunchChoice === 'veg' ? 'Veg' : 'Non-Veg'}</span>` : 
+                                                    '<span class="text-red-600">🍽️ Pending</span>'
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="delete-player-btn bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600" data-team-id="${teamId}" data-player-id="${playerId}">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    modal.querySelectorAll('.delete-player-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const teamId = e.target.dataset.teamId;
+            const playerId = e.target.dataset.playerId;
+            if (confirm('Delete this player?')) {
+                await remove(ref(database, `teams/${teamId}/players/${playerId}`));
+                showToast('Player deleted', 'success');
+                modal.remove();
+                showOrganizerDashboard();
+            }
+        });
+    });
+}
+
+function showEditTeamModal(teamId, team) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Edit Team</h3>
+            
+            <form id="edit-team-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">League</label>
+                    <select id="edit-league" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
+                        <option value="pro-volleyball" ${team.leagueId === 'pro-volleyball' ? 'selected' : ''}>Professional Volleyball</option>
+                        <option value="regular-volleyball" ${team.leagueId === 'regular-volleyball' ? 'selected' : ''}>Regular Volleyball</option>
+                        <option value="masters-volleyball" ${team.leagueId === 'masters-volleyball' ? 'selected' : ''}>Volleyball 45+</option>
+                        <option value="women-throwball" ${team.leagueId === 'women-throwball' ? 'selected' : ''}>Women Throwball</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Team Name</label>
+                    <input type="text" id="edit-team-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${team.name}" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Captain Name</label>
+                    <input type="text" id="edit-captain-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${team.captain.name}" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Captain Email</label>
+                    <input type="email" id="edit-captain-email" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${team.captain.email}" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Captain Phone</label>
+                    <input type="tel" id="edit-captain-phone" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${team.captain.phone}" required>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" class="cancel-edit flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.cancel-edit').addEventListener('click', () => modal.remove());
+    
+    modal.querySelector('#edit-team-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const updates = {
+            name: document.getElementById('edit-team-name').value,
+            leagueId: document.getElementById('edit-league').value,
+            'captain/name': document.getElementById('edit-captain-name').value,
+            'captain/email': document.getElementById('edit-captain-email').value,
+            'captain/phone': document.getElementById('edit-captain-phone').value
+        };
+        
+        try {
+            await update(ref(database, `teams/${teamId}`), updates);
+            
+            // Also update captain record
+            const captainQuery = query(ref(database, 'captains'), orderByChild('teamId'), equalTo(teamId));
+            const captainSnapshot = await get(captainQuery);
+            if (captainSnapshot.exists()) {
+                const captainId = Object.keys(captainSnapshot.val())[0];
+                await update(ref(database, `captains/${captainId}`), {
+                    name: updates['captain/name'],
+                    email: updates['captain/email'],
+                    phone: updates['captain/phone'],
+                    teamName: updates.name,
+                    leagueId: updates.leagueId
+                });
+            }
+            
+            showToast('Team updated successfully!', 'success');
+            modal.remove();
+            showOrganizerDashboard();
+        } catch (error) {
+            showToast('Error updating team: ' + error.message, 'error');
+        }
+    });
+}
+
+async function deleteTeam(teamId) {
+    try {
+        // Delete team
+        await remove(ref(database, `teams/${teamId}`));
+        
+        // Delete captain record
+        const captainQuery = query(ref(database, 'captains'), orderByChild('teamId'), equalTo(teamId));
+        const captainSnapshot = await get(captainQuery);
+        if (captainSnapshot.exists()) {
+            const captainId = Object.keys(captainSnapshot.val())[0];
+            await remove(ref(database, `captains/${captainId}`));
+        }
+        
+        showToast('Team deleted successfully', 'success');
+        showOrganizerDashboard();
+    } catch (error) {
+        showToast('Error deleting team: ' + error.message, 'error');
     }
 }
 
