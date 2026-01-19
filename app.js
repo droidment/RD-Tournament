@@ -1849,10 +1849,19 @@ async function showOrganizerDashboard() {
     
     // Manage Organizers button
     const manageOrganizersBtn = document.getElementById('manage-organizers-btn');
+    console.log('🔍 Manage Organizers button found:', manageOrganizersBtn);
     if (manageOrganizersBtn) {
-        manageOrganizersBtn.addEventListener('click', () => {
-            showManageOrganizersModal();
+        manageOrganizersBtn.addEventListener('click', async () => {
+            console.log('👥 Manage Organizers clicked!');
+            try {
+                await showManageOrganizersModal();
+            } catch (error) {
+                console.error('Error showing manage organizers modal:', error);
+                showToast('Error opening organizers management: ' + error.message, 'error');
+            }
         });
+    } else {
+        console.error('❌ Manage Organizers button NOT found in DOM!');
     }
     
     // Message All Captains button
@@ -1913,17 +1922,23 @@ async function showOrganizerDashboard() {
 // ============================================
 
 async function showManageOrganizersModal() {
-    // Get current organizers from database
-    const organizersRef = ref(database, 'organizers');
-    const organizersSnapshot = await get(organizersRef);
-    const organizers = organizersSnapshot.exists() ? organizersSnapshot.val() : {};
+    console.log('🚀 showManageOrganizersModal called');
     
-    // Also include the hardcoded ones
-    const allOrganizers = new Set([...AUTHORIZED_ORGANIZERS]);
-    Object.values(organizers).forEach(org => allOrganizers.add(org.email));
-    
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    try {
+        // Get current organizers from database
+        console.log('📊 Fetching organizers from database...');
+        const organizersRef = ref(database, 'organizers');
+        const organizersSnapshot = await get(organizersRef);
+        const organizers = organizersSnapshot.exists() ? organizersSnapshot.val() : {};
+        console.log('📊 Organizers from DB:', organizers);
+        
+        // Also include the hardcoded ones
+        const allOrganizers = new Set([...AUTHORIZED_ORGANIZERS]);
+        Object.values(organizers).forEach(org => allOrganizers.add(org.email));
+        console.log('📊 All organizers:', Array.from(allOrganizers));
+        
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
     modal.innerHTML = `
         <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Manage Organizers</h3>
