@@ -1134,8 +1134,8 @@ async function showPlayerView(playerId) {
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Signature *</label>
-                                    <div class="border-2 border-gray-300 rounded-lg bg-white">
-                                        <canvas id="signature-canvas" class="w-full touch-none" style="height: 150px;"></canvas>
+                                    <div class="border-2 border-gray-300 rounded-lg bg-white" style="cursor: crosshair;">
+                                        <canvas id="signature-canvas" width="600" height="150" style="display: block; width: 100%; height: 150px; touch-action: none;"></canvas>
                                     </div>
                                     <div class="flex justify-between items-center mt-2">
                                         <p class="text-xs text-gray-500">Sign with your finger or mouse</p>
@@ -1207,82 +1207,88 @@ async function showPlayerView(playerId) {
     if (!alreadySubmitted) {
         // Setup signature canvas
         const canvas = document.getElementById('signature-canvas');
+        if (!canvas) {
+            console.error('Canvas not found!');
+            return;
+        }
+        
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
         let hasSignature = false;
         
-        // Set canvas size
-        canvas.width = canvas.offsetWidth;
-        canvas.height = 150;
+        // Canvas is already sized in HTML (width="600" height="150")
+        // Just configure the drawing context
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         
-        // Drawing functions
-        function getCoordinates(e) {
+        // Get mouse/touch position relative to canvas
+        function getPosition(e) {
             const rect = canvas.getBoundingClientRect();
-            if (e.touches && e.touches.length > 0) {
-                // Touch event
-                return {
-                    x: e.touches[0].clientX - rect.left,
-                    y: e.touches[0].clientY - rect.top
-                };
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            let clientX, clientY;
+            
+            if (e.type.includes('touch')) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
             } else {
-                // Mouse event
-                return {
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
-                };
+                clientX = e.clientX;
+                clientY = e.clientY;
             }
+            
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
         }
         
-        function startDrawing(e) {
+        // Start drawing
+        function handleStart(e) {
+            e.preventDefault();
             isDrawing = true;
-            const coords = getCoordinates(e);
+            hasSignature = true;
+            const pos = getPosition(e);
             ctx.beginPath();
-            ctx.moveTo(coords.x, coords.y);
-            hasSignature = true; // Mark as having signature immediately
+            ctx.moveTo(pos.x, pos.y);
         }
         
-        function draw(e) {
+        // Continue drawing
+        function handleMove(e) {
             if (!isDrawing) return;
             e.preventDefault();
-            
-            const coords = getCoordinates(e);
-            ctx.lineTo(coords.x, coords.y);
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            const pos = getPosition(e);
+            ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
         }
         
-        function stopDrawing() {
+        // Stop drawing
+        function handleEnd(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
             isDrawing = false;
-            ctx.beginPath(); // Reset path for next drawing
+            ctx.closePath();
         }
         
         // Mouse events
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
+        canvas.addEventListener('mousedown', handleStart, false);
+        canvas.addEventListener('mousemove', handleMove, false);
+        canvas.addEventListener('mouseup', handleEnd, false);
+        canvas.addEventListener('mouseleave', handleEnd, false);
         
-        // Touch events (with preventDefault to avoid conflicts)
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            startDrawing(e);
-        });
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            draw(e);
-        });
-        canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            stopDrawing();
-        });
+        // Touch events
+        canvas.addEventListener('touchstart', handleStart, false);
+        canvas.addEventListener('touchmove', handleMove, false);
+        canvas.addEventListener('touchend', handleEnd, false);
+        canvas.addEventListener('touchcancel', handleEnd, false);
         
         // Clear signature button
         document.getElementById('clear-signature').addEventListener('click', () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             hasSignature = false;
+            showToast('Signature cleared', 'info');
         });
         
         document.getElementById('player-form').addEventListener('submit', async (e) => {
