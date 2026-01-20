@@ -3407,7 +3407,7 @@ function updateProgressToast(toast, message) {
 
 function messageAllPlayers(teams) {
     const players = [];
-    
+
     Object.values(teams).forEach(team => {
         if (team.players) {
             Object.values(team.players).forEach(player => {
@@ -3422,114 +3422,182 @@ function messageAllPlayers(teams) {
             });
         }
     });
-    
+
     if (players.length === 0) {
         showToast('No players to message', 'error');
         return;
     }
-    
+
     // Filter options
     const pendingWaiverPlayers = players.filter(p => !p.waiverSigned);
     const pendingLunchPlayers = players.filter(p => !p.lunchChoice);
     const completePlayers = players.filter(p => p.waiverSigned && p.lunchChoice);
-    
+
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
     modal.innerHTML = `
-        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Message Players</h3>
-            
-            <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                <p class="text-sm text-gray-700 mb-2">
-                    <strong>Select which players to message:</strong>
-                </p>
-                <div class="space-y-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="player-filter" value="all" checked class="w-4 h-4">
-                        <span class="text-sm">All Players (${players.length})</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="player-filter" value="pending-waiver" class="w-4 h-4">
-                        <span class="text-sm">Only Pending Waiver (${pendingWaiverPlayers.length})</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="player-filter" value="pending-lunch" class="w-4 h-4">
-                        <span class="text-sm">Only Pending Lunch (${pendingLunchPlayers.length})</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="player-filter" value="complete" class="w-4 h-4">
-                        <span class="text-sm">Only Completed (${completePlayers.length})</span>
-                    </label>
+
+            <!-- Quick Filter Buttons -->
+            <div class="mb-4 flex flex-wrap gap-2">
+                <button id="select-all-players" class="px-4 py-2 bg-green-100 text-gray-800 rounded-lg hover:bg-green-200 text-sm font-semibold">
+                    ✅ Select All (${players.length})
+                </button>
+                <button id="deselect-all-players" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm font-semibold">
+                    ❌ Deselect All
+                </button>
+                <button id="select-pending-waiver" class="px-4 py-2 bg-red-100 text-gray-800 rounded-lg hover:bg-red-200 text-sm font-semibold">
+                    📝 Pending Waiver (${pendingWaiverPlayers.length})
+                </button>
+                <button id="select-pending-lunch" class="px-4 py-2 bg-yellow-100 text-gray-800 rounded-lg hover:bg-yellow-200 text-sm font-semibold">
+                    🍽️ Pending Lunch (${pendingLunchPlayers.length})
+                </button>
+                <div class="flex-1"></div>
+                <div class="px-3 py-2 bg-blue-50 rounded-lg text-sm font-semibold text-blue-700">
+                    Selected: <span id="selected-player-count">0</span>
                 </div>
             </div>
-            
+
+            <!-- Player List with Checkboxes -->
+            <div class="mb-4 border border-gray-300 rounded-lg max-h-96 overflow-y-auto">
+                <div class="sticky top-0 bg-gray-50 border-b border-gray-300 p-2 text-xs font-semibold text-gray-700 grid grid-cols-12 gap-2">
+                    <div class="col-span-1 text-center">Select</div>
+                    <div class="col-span-3">Player</div>
+                    <div class="col-span-3">Team</div>
+                    <div class="col-span-2">Phone</div>
+                    <div class="col-span-3 text-center">Status</div>
+                </div>
+                ${players.map((player, index) => {
+                    const waiverIcon = player.waiverSigned ? '✅' : '❌';
+                    const lunchIcon = player.lunchChoice ? '✅' : '❌';
+                    const statusColor = (player.waiverSigned && player.lunchChoice) ? 'text-green-600' : 'text-red-600';
+                    return `
+                    <div class="p-2 border-b border-gray-200 hover:bg-gray-50 text-xs grid grid-cols-12 gap-2 items-center">
+                        <div class="col-span-1 text-center">
+                            <input type="checkbox" class="player-checkbox w-4 h-4 cursor-pointer"
+                                   data-index="${index}">
+                        </div>
+                        <div class="col-span-3">
+                            <div class="font-semibold">${player.name}</div>
+                            <div class="text-gray-500 text-xs">${player.email || 'No email'}</div>
+                        </div>
+                        <div class="col-span-3 font-medium">${player.team}</div>
+                        <div class="col-span-2 text-gray-600">${player.phone}</div>
+                        <div class="col-span-3 text-center ${statusColor}">
+                            <span title="Waiver">${waiverIcon}</span>
+                            <span title="Lunch">${lunchIcon}</span>
+                        </div>
+                    </div>
+                    `;
+                }).join('')}
+            </div>
+
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Message Template:</label>
-                <textarea id="player-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-48 text-sm">Hi {name}!
+                <textarea id="player-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-32 text-sm">Hi {name}!
 
 Reminder for Republic Day Tournament 2026 🏐
 
 *Team:* {team}
 
-🔗 *App Link:* https://rd-tournament.vercel.app
-
 *Please complete your registration ASAP:*
 ✅ Sign the liability waiver
-✅ Select lunch preference (Veg/Non-Veg)
+✅ Select lunch preference
 
 *Tournament Date:* January 24, 2026
 
-We need your registration to finalize catering and logistics!
-
 See you at the tournament! 🎉</textarea>
+                <p class="text-xs text-gray-500 mt-1">Variables: {name}, {team}</p>
             </div>
-            
+
             <div class="flex gap-3">
-                <button class="close-modal flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400">
+                <button class="close-modal flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-semibold">
                     Cancel
                 </button>
-                <button id="send-to-players" class="flex-1 bg-indigo-100 text-gray-800 py-2 rounded-lg hover:bg-indigo-200">
-                    Open WhatsApp for Selected Players
+                <button id="send-to-players" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
+                    📱 Send to <span id="send-count">0</span> Players
                 </button>
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
+    // Update selected count
+    function updateSelectedCount() {
+        const checkboxes = modal.querySelectorAll('.player-checkbox:checked');
+        const count = checkboxes.length;
+        modal.querySelector('#selected-player-count').textContent = count;
+        modal.querySelector('#send-count').textContent = count;
+    }
+
+    // Select All
+    modal.querySelector('#select-all-players').addEventListener('click', () => {
+        modal.querySelectorAll('.player-checkbox').forEach(cb => cb.checked = true);
+        updateSelectedCount();
+    });
+
+    // Deselect All
+    modal.querySelector('#deselect-all-players').addEventListener('click', () => {
+        modal.querySelectorAll('.player-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedCount();
+    });
+
+    // Select Pending Waiver
+    modal.querySelector('#select-pending-waiver').addEventListener('click', () => {
+        modal.querySelectorAll('.player-checkbox').forEach((cb, idx) => {
+            cb.checked = !players[idx].waiverSigned;
+        });
+        updateSelectedCount();
+    });
+
+    // Select Pending Lunch
+    modal.querySelector('#select-pending-lunch').addEventListener('click', () => {
+        modal.querySelectorAll('.player-checkbox').forEach((cb, idx) => {
+            cb.checked = !players[idx].lunchChoice;
+        });
+        updateSelectedCount();
+    });
+
+    // Checkbox change
+    modal.querySelectorAll('.player-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+
     modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
-    
+
     modal.querySelector('#send-to-players').addEventListener('click', () => {
         const messageTemplate = document.getElementById('player-message').value;
-        const filter = document.querySelector('input[name="player-filter"]:checked').value;
-        
-        let selectedPlayers = players;
-        if (filter === 'pending-waiver') selectedPlayers = pendingWaiverPlayers;
-        if (filter === 'pending-lunch') selectedPlayers = pendingLunchPlayers;
-        if (filter === 'complete') selectedPlayers = completePlayers;
-        
-        if (selectedPlayers.length === 0) {
-            showToast('No players match the selected filter', 'error');
+        const selectedCheckboxes = modal.querySelectorAll('.player-checkbox:checked');
+
+        if (selectedCheckboxes.length === 0) {
+            showToast('Please select at least one player', 'error');
             return;
         }
-        
+
+        const selectedPlayers = Array.from(selectedCheckboxes).map(cb => {
+            const index = parseInt(cb.dataset.index);
+            return players[index];
+        });
+
         let successCount = 0;
         selectedPlayers.forEach((player, index) => {
             setTimeout(() => {
                 const personalizedMessage = messageTemplate
-                    .replace('{name}', player.name)
-                    .replace('{team}', player.team);
-                
+                    .replace(/{name}/g, player.name)
+                    .replace(/{team}/g, player.team);
+
                 const whatsappUrl = `https://wa.me/${player.phone.replace(/\D/g, '')}?text=${encodeURIComponent(personalizedMessage)}`;
                 window.open(whatsappUrl, '_blank');
                 successCount++;
-                
+
                 if (successCount === selectedPlayers.length) {
                     showToast(`Opened WhatsApp for ${selectedPlayers.length} players!`, 'success');
                 }
             }, index * 1000); // 1 second delay between each
         });
-        
+
         modal.remove();
     });
 }
