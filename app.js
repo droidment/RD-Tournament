@@ -938,7 +938,6 @@ async function showCaptainView() {
             }
         });
     });
-    });
 }
 
 function showAddPlayerModal(teamId) {
