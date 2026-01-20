@@ -1,15 +1,12 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const sgMail = require('@sendgrid/mail');
+const { defineSecret } = require('firebase-functions/params');
 
 admin.initializeApp();
 
-// Get SendGrid API key from environment variable
-// Set this in Firebase console: Project Settings > Functions > Configuration
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-if (SENDGRID_API_KEY) {
-    sgMail.setApiKey(SENDGRID_API_KEY);
-}
+// Define secret for SendGrid API key
+const sendgridApiKey = defineSecret('SENDGRID_API_KEY');
 
 // Organizer email to receive waiver copies
 const ORGANIZER_EMAIL = 'rbalakr@gmail.com';
@@ -18,9 +15,15 @@ const ORGANIZER_EMAIL = 'rbalakr@gmail.com';
  * Cloud Function triggered when a waiver PDF is uploaded to Firebase Storage
  * Sends email with PDF attachment to player and organizer
  */
-exports.sendWaiverEmail = functions.database
-    .ref('/teams/{teamId}/players/{playerId}/pdfPath')
+exports.sendWaiverEmail = functions
+    .runWith({ secrets: [sendgridApiKey] })
+    .database.ref('/teams/{teamId}/players/{playerId}/pdfPath')
     .onCreate(async (snapshot, context) => {
+        // Initialize SendGrid with the secret
+        const SENDGRID_API_KEY = sendgridApiKey.value();
+        if (SENDGRID_API_KEY) {
+            sgMail.setApiKey(SENDGRID_API_KEY);
+        }
         try {
             const pdfPath = snapshot.val();
             const { teamId, playerId } = context.params;
