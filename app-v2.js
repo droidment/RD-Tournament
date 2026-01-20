@@ -8,6 +8,9 @@ const AUTHORIZED_ORGANIZERS = [
     "droidment@gmail.com"
 ];
 
+// Email to receive waiver copies
+const WAIVER_COPY_EMAIL = "rbalakr@gmail.com";
+
 // ============================================
 // FIREBASE INITIALIZATION
 // ============================================
@@ -1409,6 +1412,139 @@ function copyPlayerLink(playerId) {
 }
 
 // ============================================
+// PDF GENERATION FOR WAIVER
+// ============================================
+function generateWaiverPDF(playerData, teamData, signatureDataURL) {
+    // Check if jsPDF is loaded
+    if (typeof window.jspdf === 'undefined') {
+        showToast('PDF library not loaded. Please refresh the page.', 'error');
+        return null;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const contentWidth = pageWidth - (2 * margin);
+    let yPosition = 20;
+
+    // Title
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text('REPUBLIC DAY TOURNAMENT', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 7;
+    doc.text('WAIVER AND RELEASE OF LIABILITY', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 15;
+
+    // Player Info
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Player Name: ${playerData.name}`, margin, yPosition);
+    yPosition += 6;
+    doc.text(`Team: ${teamData.name}`, margin, yPosition);
+    yPosition += 6;
+    doc.text(`League: ${getLeagueName(teamData.leagueId)}`, margin, yPosition);
+    yPosition += 6;
+    doc.text(`Date Signed: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, margin, yPosition);
+    yPosition += 10;
+
+    // Waiver Text
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    const title = 'READ BEFORE SIGNING';
+    doc.text(title, margin, yPosition);
+    yPosition += 7;
+
+    doc.setFont(undefined, 'normal');
+    const intro = 'In consideration of being allowed to participate in any way in the Republic Day Volleyball and Throwball Tournament, related events and activities, the undersigned acknowledges, appreciates, and agrees that:';
+    const introLines = doc.splitTextToSize(intro, contentWidth);
+    doc.text(introLines, margin, yPosition);
+    yPosition += (introLines.length * 5) + 5;
+
+    // Waiver clauses
+    const clauses = [
+        'The risks of injury and illness (ex: communicable diseases such as MRSA, influenza, and COVID-19) from the activities involved in this program are significant, including the potential for permanent paralysis and death, and while particular rules, equipment, and personal discipline may reduce these risks, the risks of serious injury and illness do exist; and,',
+        'I understand that it is my personal responsibility to inspect the playing area and determine whether or not it is safe. By participating in the tournament, I acknowledge that I have inspected the area and I take full responsibility for my decision to participate in the tournament.',
+        'I KNOWINGLY AND FREELY ASSUME ALL SUCH RISKS, both known and unknown, EVEN IF ARISING FROM THE NEGLIGENCE OF THE RELEASEES or others, and assume full responsibility for my participation; and,',
+        'I willingly agree to comply with the stated and customary terms and conditions for participation. If, however, I observe any unusual significant hazard during my presence or participation, I will remove myself from participation and bring such to the attention of the nearest official immediately; and,',
+        'I acknowledge and understand that court assignments and placement within the facility are determined solely by the tournament organizers and are not the responsibility of the facility or its staff. I further understand that all courts will be in simultaneous use throughout the tournament, and by my participation, I confirm that I have reviewed and accept the competitive environment and playing conditions; and,',
+        'I understand that court placement within the facility is decided by the tournament host, and not by anyone associated with the facility itself. I understand that all courts will be in use simultaneously and by my participation indicate that I have approved of the competition environment; and,',
+        'I, for myself and on behalf of my heirs, assigns, personal representatives and next of kin, HEREBY RELEASE AND HOLD HARMLESS Republic Day Volleyball and Throwball Tournament, Katy Whackers Club, Empower Her foundation & Faith West Incorporated their officers, officials, agents, and/or employees, other participants, sponsoring agencies, sponsors, advertisers, and if applicable, owners and lessors of premises used to conduct the event ("RELEASEES"), WITH RESPECT TO ANY AND ALL INJURY, ILLNESS, DISABILITY, DEATH, or loss or damage to person or property, WHETHER ARISING FROM THE NEGLIGENCE OF THE RELEASEES OR OTHERWISE, to the fullest extent permitted by law.'
+    ];
+
+    clauses.forEach((clause, index) => {
+        const clauseText = `${index + 1}. ${clause}`;
+        const clauseLines = doc.splitTextToSize(clauseText, contentWidth - 5);
+
+        // Check if we need a new page
+        if (yPosition + (clauseLines.length * 4) > doc.internal.pageSize.getHeight() - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
+
+        doc.text(clauseLines, margin + 5, yPosition);
+        yPosition += (clauseLines.length * 4) + 4;
+    });
+
+    // Final statement
+    yPosition += 5;
+    if (yPosition > doc.internal.pageSize.getHeight() - 60) {
+        doc.addPage();
+        yPosition = 20;
+    }
+
+    doc.setFont(undefined, 'bold');
+    const finalStatement = 'I HAVE READ THIS RELEASE OF LIABILITY AND ASSUMPTION OF RISK AGREEMENT, FULLY UNDERSTAND ITS TERMS, UNDERSTAND THAT I HAVE GIVEN UP SUBSTANTIAL RIGHTS BY SIGNING IT, AND SIGN IT FREELY AND VOLUNTARILY WITHOUT ANY INDUCEMENT.';
+    const finalLines = doc.splitTextToSize(finalStatement, contentWidth);
+    doc.text(finalLines, margin, yPosition);
+    yPosition += (finalLines.length * 4) + 10;
+
+    // Signature section
+    doc.setFont(undefined, 'normal');
+    doc.text(`Full Legal Name: ${playerData.waiverFullName}`, margin, yPosition);
+    yPosition += 10;
+
+    // Add signature image
+    if (signatureDataURL) {
+        try {
+            doc.text('Digital Signature:', margin, yPosition);
+            yPosition += 5;
+            // Add signature image (scaled to fit)
+            const imgWidth = 80;
+            const imgHeight = 20;
+            doc.addImage(signatureDataURL, 'PNG', margin, yPosition, imgWidth, imgHeight);
+            yPosition += imgHeight + 5;
+        } catch (error) {
+            console.error('Error adding signature to PDF:', error);
+            doc.text('Signature: [Digital signature on file]', margin, yPosition);
+            yPosition += 10;
+        }
+    }
+
+    // Add age verification if applicable
+    if (teamData.leagueId === 'masters-volleyball' && playerData.ageVerified) {
+        yPosition += 5;
+        doc.setFont(undefined, 'bold');
+        doc.text('Age Verification: 45+ League - Verified', margin, yPosition);
+        yPosition += 7;
+        doc.setFont(undefined, 'normal');
+    }
+
+    // Add lunch choice
+    yPosition += 5;
+    doc.text(`Lunch Preference: ${getLunchChoiceDisplay(playerData.lunchChoice)}`, margin, yPosition);
+    yPosition += 10;
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(100);
+    doc.text('Republic Day Tournament 2026 - January 24, 2026', pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+
+    return doc;
+}
+
+// ============================================
 // PLAYER VIEW
 // ============================================
 async function showPlayerView(playerId) {
@@ -1493,12 +1629,29 @@ async function showPlayerView(playerId) {
                             </div>
                         ` : ''}
                     </div>
-                    
+
                     <p class="text-sm text-gray-500 mt-4">See you at the tournament on January 24, 2026!</p>
-                    
-                    <button onclick="window.location.href='${window.location.origin}${window.location.pathname}'" class="mt-6 bg-blue-100 text-gray-800 px-6 py-3 rounded-lg hover:bg-blue-200 font-semibold">
-                        Return to Main Page
-                    </button>
+
+                    <div class="mt-6 space-y-3">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <p class="text-sm font-semibold text-gray-800 mb-3">Send Waiver Copy via Email</p>
+                            <div class="flex gap-2 flex-wrap">
+                                <button id="download-pdf-btn" class="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-semibold flex items-center justify-center gap-2">
+                                    <span>📥</span>
+                                    <span>Download PDF</span>
+                                </button>
+                                <button id="email-pdf-btn" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold flex items-center justify-center gap-2">
+                                    <span>📧</span>
+                                    <span>Email PDF</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-2">A copy will also be sent to the tournament organizer</p>
+                        </div>
+
+                        <button onclick="window.location.href='${window.location.origin}${window.location.pathname}'" class="w-full bg-gray-100 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-200 font-semibold">
+                            Return to Main Page
+                        </button>
+                    </div>
                 </div>
             ` : `
                 <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8">
@@ -1534,6 +1687,7 @@ async function showPlayerView(playerId) {
                                     <li>I KNOWINGLY AND FREELY ASSUME ALL SUCH RISKS, both known and unknown, EVEN IF ARISING FROM THE NEGLIGENCE OF THE RELEASEES or others, and assume full responsibility for my participation; and,</li>
                                     <li>I willingly agree to comply with the stated and customary terms and conditions for participation. If, however, I observe any unusual significant hazard during my presence or participation, I will remove myself from participation and bring such to the attention of the nearest official immediately; and,</li>
                                     <li>I acknowledge and understand that court assignments and placement within the facility are determined solely by the tournament organizers and are not the responsibility of the facility or its staff. I further understand that all courts will be in simultaneous use throughout the tournament, and by my participation, I confirm that I have reviewed and accept the competitive environment and playing conditions; and,</li>
+                                    <li>I understand that court placement within the facility is decided by the tournament host, and not by anyone associated with the facility itself. I understand that all courts will be in use simultaneously and by my participation indicate that I have approved of the competition environment; and,</li>
                                     <li>I, for myself and on behalf of my heirs, assigns, personal representatives and next of kin, HEREBY RELEASE AND HOLD HARMLESS <strong>Republic Day Volleyball and Throwball Tournament, Katy Whackers Club, Empower Her foundation & Faith West Incorporated</strong> their officers, officials, agents, and/or employees, other participants, sponsoring agencies, sponsors, advertisers, and if applicable, owners and lessors of premises used to conduct the event ("RELEASEES"), WITH RESPECT TO ANY AND ALL INJURY, ILLNESS, DISABILITY, DEATH, or loss or damage to person or property, WHETHER ARISING FROM THE NEGLIGENCE OF THE RELEASEES OR OTHERWISE, to the fullest extent permitted by law.</li>
                                 </ol>
                                 <p class="mt-4 font-semibold">I HAVE READ THIS RELEASE OF LIABILITY AND ASSUMPTION OF RISK AGREEMENT, FULLY UNDERSTAND ITS TERMS, UNDERSTAND THAT I HAVE GIVEN UP SUBSTANTIAL RIGHTS BY SIGNING IT, AND SIGN IT FREELY AND VOLUNTARILY WITHOUT ANY INDUCEMENT.</p>
@@ -1740,7 +1894,9 @@ In consideration of being allowed to participate in any way in the Republic Day 
 
 5. I acknowledge and understand that court assignments and placement within the facility are determined solely by the tournament organizers and are not the responsibility of the facility or its staff. I further understand that all courts will be in simultaneous use throughout the tournament, and by my participation, I confirm that I have reviewed and accept the competitive environment and playing conditions; and,
 
-6. I, for myself and on behalf of my heirs, assigns, personal representatives and next of kin, HEREBY RELEASE AND HOLD HARMLESS Republic Day Volleyball and Throwball Tournament, Katy Whackers Club, Empower Her foundation & Faith West Incorporated their officers, officials, agents, and/or employees, other participants, sponsoring agencies, sponsors, advertisers, and if applicable, owners and lessors of premises used to conduct the event ("RELEASEES"), WITH RESPECT TO ANY AND ALL INJURY, ILLNESS, DISABILITY, DEATH, or loss or damage to person or property, WHETHER ARISING FROM THE NEGLIGENCE OF THE RELEASEES OR OTHERWISE, to the fullest extent permitted by law.
+6. I understand that court placement within the facility is decided by the tournament host, and not by anyone associated with the facility itself. I understand that all courts will be in use simultaneously and by my participation indicate that I have approved of the competition environment; and,
+
+7. I, for myself and on behalf of my heirs, assigns, personal representatives and next of kin, HEREBY RELEASE AND HOLD HARMLESS Republic Day Volleyball and Throwball Tournament, Katy Whackers Club, Empower Her foundation & Faith West Incorporated their officers, officials, agents, and/or employees, other participants, sponsoring agencies, sponsors, advertisers, and if applicable, owners and lessors of premises used to conduct the event ("RELEASEES"), WITH RESPECT TO ANY AND ALL INJURY, ILLNESS, DISABILITY, DEATH, or loss or damage to person or property, WHETHER ARISING FROM THE NEGLIGENCE OF THE RELEASEES OR OTHERWISE, to the fullest extent permitted by law.
 
 I HAVE READ THIS RELEASE OF LIABILITY AND ASSUMPTION OF RISK AGREEMENT, FULLY UNDERSTAND ITS TERMS, UNDERSTAND THAT I HAVE GIVEN UP SUBSTANTIAL RIGHTS BY SIGNING IT, AND SIGN IT FREELY AND VOLUNTARILY WITHOUT ANY INDUCEMENT.
 
@@ -1837,6 +1993,100 @@ Please sign and bring this form to the tournament if you prefer a paper copy.
                 showToast('Error submitting form: ' + error.message, 'error');
             }
         });
+    } else {
+        // Add event listeners for PDF buttons when waiver is already submitted
+        const downloadBtn = document.getElementById('download-pdf-btn');
+        const emailBtn = document.getElementById('email-pdf-btn');
+
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                const pdf = generateWaiverPDF(playerData, teamData, playerData.waiverSignature);
+                if (pdf) {
+                    const fileName = `Waiver_${playerData.name.replace(/\s+/g, '_')}_${teamData.name.replace(/\s+/g, '_')}.pdf`;
+                    pdf.save(fileName);
+                    showToast('PDF downloaded successfully!', 'success');
+                }
+            });
+        }
+
+        if (emailBtn) {
+            emailBtn.addEventListener('click', () => {
+                const pdf = generateWaiverPDF(playerData, teamData, playerData.waiverSignature);
+                if (!pdf) return;
+
+                // Generate PDF as base64 data URL
+                const pdfData = pdf.output('dataurlstring');
+                const fileName = `Waiver_${playerData.name.replace(/\s+/g, '_')}_${teamData.name.replace(/\s+/g, '_')}.pdf`;
+
+                // Create email subject and body
+                const subject = encodeURIComponent(`Tournament Waiver - ${playerData.name} - ${teamData.name}`);
+                const body = encodeURIComponent(`Dear Tournament Organizer,
+
+Please find attached my signed waiver form for the Republic Day Tournament 2026.
+
+Player Details:
+- Name: ${playerData.name}
+- Team: ${teamData.name}
+- League: ${getLeagueName(teamData.leagueId)}
+- Date Signed: ${new Date(playerData.waiverSignedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+- Lunch Preference: ${getLunchChoiceDisplay(playerData.lunchChoice)}
+
+Note: Unfortunately, email clients don't support attaching PDFs via mailto: links. Please:
+1. Download the PDF using the "Download PDF" button
+2. Attach it manually to your email
+3. Send to: ${WAIVER_COPY_EMAIL} and your email address
+
+Thank you!
+
+${playerData.name}
+Tournament Date: January 24, 2026`);
+
+                // Create mailto link with CC to organizer
+                const playerEmail = playerData.email || '';
+                const mailto = `mailto:${playerEmail}?cc=${WAIVER_COPY_EMAIL}&subject=${subject}&body=${body}`;
+
+                // Show instruction modal
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg max-w-md w-full p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Email Your Waiver</h3>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p class="font-semibold text-blue-700">Email clients cannot attach PDFs automatically via web links.</p>
+                            <p>Please follow these steps:</p>
+                            <ol class="list-decimal ml-5 space-y-2">
+                                <li><strong>Download the PDF</strong> using the "Download PDF" button</li>
+                                <li><strong>Click "Open Email"</strong> below to open your email client with pre-filled content</li>
+                                <li><strong>Attach the downloaded PDF</strong> to the email</li>
+                                <li><strong>Send</strong> to yourself and CC: <span class="font-mono text-xs bg-gray-100 px-1">${WAIVER_COPY_EMAIL}</span></li>
+                            </ol>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mt-3">
+                                <p class="text-xs"><strong>Tip:</strong> The email will have the organizer's email pre-filled in CC field.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button id="close-email-modal" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 font-semibold">
+                                Cancel
+                            </button>
+                            <button id="open-email-btn" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold">
+                                Open Email
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                modal.querySelector('#close-email-modal').addEventListener('click', () => {
+                    modal.remove();
+                });
+
+                modal.querySelector('#open-email-btn').addEventListener('click', () => {
+                    window.location.href = mailto;
+                    modal.remove();
+                    showToast('Email opened! Please attach the PDF and send.', 'info');
+                });
+            });
+        }
     }
 }
 
