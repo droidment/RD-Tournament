@@ -4,9 +4,9 @@ const sgMail = require('@sendgrid/mail');
 
 admin.initializeApp();
 
-// Get SendGrid API key from Firebase config
-// Set this with: firebase functions:config:set sendgrid.key="YOUR_API_KEY"
-const SENDGRID_API_KEY = functions.config().sendgrid?.key;
+// Get SendGrid API key from environment variable
+// Set this in Firebase console: Project Settings > Functions > Configuration
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 if (SENDGRID_API_KEY) {
     sgMail.setApiKey(SENDGRID_API_KEY);
 }
