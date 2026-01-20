@@ -19,13 +19,13 @@ import { getDatabase, ref, set, get, push, remove, onValue, update, query, order
 // FIREBASE CONFIGURATION
 // ============================================
 const firebaseConfig = {
-  apiKey: "AIzaSyB1zUvkLhY--wd3QjjMI3_hn6d1iWqKmIc",
-  authDomain: "rd-tournament-d7257.firebaseapp.com",
-  databaseURL: "https://rd-tournament-d7257-default-rtdb.firebaseio.com",
-  projectId: "rd-tournament-d7257",
-  storageBucket: "rd-tournament-d7257.firebasestorage.app",
-  messagingSenderId: "44554845474",
-  appId: "1:44554845474:web:2569c71c0f3261fbbb397b"
+  apiKey: "AIzaSyBCUwMscAGlgJZM-D5Sx42DVetBppr5grM",
+  authDomain: "rdtournament2026.firebaseapp.com",
+  databaseURL: "https://rdtournament2026-default-rtdb.firebaseio.com",
+  projectId: "rdtournament2026",
+  storageBucket: "rdtournament2026.firebasestorage.app",
+  messagingSenderId: "363825930883",
+  appId: "1:363825930883:web:d8eabb507c6c3bcf0b71b6"
 };
 
 let app, auth, database;
