@@ -3633,7 +3633,7 @@ function showTeamPlayersModal(teamId, team) {
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <h4 class="font-semibold text-gray-800">${player.name}</h4>
-                                        <p class="text-sm text-gray-600">${player.email}</p>
+                                        <p class="text-sm text-gray-600">${player.email || 'No email provided'}</p>
                                         <p class="text-sm text-gray-600">${player.phone}</p>
                                         
                                         <div class="mt-2 flex flex-wrap gap-3 text-xs">
