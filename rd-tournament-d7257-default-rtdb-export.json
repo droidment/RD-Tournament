@@ -1,0 +1,852 @@
+{
+  "captains": {
+    "captain_001": {
+      "email": "reddi1211@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Sree/Karuna",
+      "phone": "+19187204253",
+      "teamId": "team_001",
+      "teamName": "Cool blues"
+    },
+    "captain_002": {
+      "email": "mohan.sdn@gmail.com",
+      "leagueId": "masters-volleyball",
+      "name": "Mohan",
+      "phone": "+15037240172",
+      "teamId": "team_002",
+      "teamName": "Eternal Volleyers"
+    },
+    "captain_003": {
+      "email": "poonjamalika@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Malika Poonja",
+      "phone": "+14699396215",
+      "teamId": "team_003",
+      "teamName": "Dallas Rebels"
+    },
+    "captain_004": {
+      "email": "swathi.kommineni3@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Swathi Kommineni",
+      "phone": "+14252137542",
+      "teamId": "team_004",
+      "teamName": "Austin Challengers"
+    },
+    "captain_005": {
+      "email": "gunnapanenimanikanta2000@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Hemanth Gudipudi",
+      "phone": "+15139968033",
+      "teamId": "team_005",
+      "teamName": "Skywalkers"
+    },
+    "captain_006": {
+      "email": "Markmeenakshi@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Meenakshi Krishan",
+      "phone": "+18577018892",
+      "teamId": "team_006",
+      "teamName": "TX Commandos"
+    },
+    "captain_007": {
+      "email": "n.praneetha@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Sandhana",
+      "phone": "+18327487015",
+      "teamId": "team_007",
+      "teamName": "Houston Hotshots"
+    },
+    "captain_008": {
+      "email": "smani5578@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Sendil",
+      "phone": "+12147942190",
+      "teamId": "team_008",
+      "teamName": "SA Young Guns"
+    },
+    "captain_009": {
+      "email": "jossyvattakuzhiyil@gmail.com",
+      "leagueId": "masters-volleyball",
+      "name": "Jossy Jacob",
+      "phone": "+18326008456",
+      "teamId": "team_009",
+      "teamName": "Abacus Travels"
+    },
+    "captain_010": {
+      "email": "raja.chitha@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Raja Jagannathan",
+      "phone": "+13463075202",
+      "teamId": "team_010",
+      "teamName": "Madaki Thattu"
+    },
+    "captain_011": {
+      "email": "rajanidhi@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Rajanidhi Rajasekeran",
+      "phone": "+15084966420",
+      "teamId": "team_011",
+      "teamName": "Defenders"
+    },
+    "captain_012": {
+      "email": "purushoth.a@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Purushothaman",
+      "phone": "+19493028420",
+      "teamId": "team_012",
+      "teamName": "Indy Roots Blue"
+    },
+    "captain_013": {
+      "email": "vrvinodchandar@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Vinod Chander",
+      "phone": "+919686800185",
+      "teamId": "team_013",
+      "teamName": "Katy whackers 1"
+    },
+    "captain_014": {
+      "email": "rbalakr@gmail.com",
+      "leagueId": "masters-volleyball",
+      "name": "Mohan Borkar",
+      "phone": "2817366661",
+      "teamId": "team_014",
+      "teamName": "Katy whackers 2"
+    },
+    "captain_015": {
+      "email": "purushoth.a+elite@gmail.com",
+      "leagueId": "masters-volleyball",
+      "name": "Purushothaman",
+      "phone": "+19493028420",
+      "teamId": "team_015",
+      "teamName": "Indy Roots Elite"
+    },
+    "captain_016": {
+      "email": "purushoth.a+black@gmail.com",
+      "leagueId": "pro-volleyball",
+      "name": "Purushothaman",
+      "phone": "+19493028420",
+      "teamId": "team_016",
+      "teamName": "Indy Roots Black"
+    },
+    "captain_017": {
+      "email": "varshiniamirtha24@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Amirthavarshini Muraleetharan",
+      "phone": "+12177512712",
+      "teamId": "team_017",
+      "teamName": "Power Strikers"
+    },
+    "captain_018": {
+      "email": "r.josephcollins@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Joseph C",
+      "phone": "+17134471803",
+      "teamId": "team_018",
+      "teamName": "HTC"
+    },
+    "captain_019": {
+      "email": "r.josephcollins+park8@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Joshua C",
+      "phone": "+17139929645",
+      "teamId": "team_019",
+      "teamName": "Park 8"
+    },
+    "captain_020": {
+      "email": "roycedxb@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Royce Samuel",
+      "phone": "+18325462909",
+      "teamId": "team_020",
+      "teamName": "Houston Challengers - Blue"
+    },
+    "captain_021": {
+      "email": "vijaib.singh@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Vijai singh",
+      "phone": "+19254003583",
+      "teamId": "team_021",
+      "teamName": "Richmond Ravens"
+    },
+    "captain_022": {
+      "email": "ramgbabu@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Ravi Venegalla",
+      "phone": "+19132207284",
+      "teamId": "team_022",
+      "teamName": "Riverstone Raptors"
+    },
+    "captain_023": {
+      "email": "Chandramohan3@gmail.com",
+      "leagueId": "masters-volleyball",
+      "name": "Chandra Govi",
+      "phone": "+13019175985",
+      "teamId": "team_023",
+      "teamName": "Cutting Chai"
+    },
+    "captain_024": {
+      "email": "deepak.kariyakar@gmail.com",
+      "leagueId": "masters-volleyball",
+      "name": "Deepak Kariyakar",
+      "phone": "+14692031967",
+      "teamId": "team_024",
+      "teamName": "Mavericks"
+    },
+    "captain_025": {
+      "email": "lazerjp@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Lazer Paulraj",
+      "phone": "+18324196761",
+      "teamId": "team_025",
+      "teamName": "Spartan Panthers"
+    },
+    "captain_026": {
+      "email": "saravanapoigaikandasamy@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Saravana Kandasamy",
+      "phone": "+13213173548",
+      "teamId": "team_026",
+      "teamName": "TSK"
+    },
+    "captain_027": {
+      "email": "karthickshanmuga24@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Karthick Shanmugamoorthy",
+      "phone": "+13469551236",
+      "teamId": "team_027",
+      "teamName": "Spartans Tigers"
+    },
+    "captain_028": {
+      "email": "1205varsha@gamil.com",
+      "leagueId": "women-throwball",
+      "name": "Varsha",
+      "phone": "+14695628980",
+      "teamId": "team_028",
+      "teamName": "Dallas divas"
+    },
+    "captain_029": {
+      "email": "ysharat721@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Sharat Yempat",
+      "phone": "+18322070285",
+      "teamId": "team_029",
+      "teamName": "Pumpkin Tax Warriors"
+    },
+    "captain_030": {
+      "email": "sri@pumpkintaxco.com",
+      "leagueId": "regular-volleyball",
+      "name": "Sri Chimbli",
+      "phone": "+12144700006",
+      "teamId": "team_030",
+      "teamName": "Pumpkin Tax"
+    },
+    "captain_031": {
+      "email": "shanno79@icloud.com",
+      "leagueId": "women-throwball",
+      "name": "Shy N",
+      "phone": "+18328692318",
+      "teamId": "team_031",
+      "teamName": "Houston Hustlers"
+    },
+    "captain_032": {
+      "email": "dkonatgam@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Deepthi Konatham",
+      "phone": "+14052500525",
+      "teamId": "team_032",
+      "teamName": "Team Shakthi"
+    },
+    "captain_033": {
+      "email": "abckoganti@gmail.com",
+      "leagueId": "pro-volleyball",
+      "name": "Aravinth Mathuranayagam",
+      "phone": "+19726559369",
+      "teamId": "team_033",
+      "teamName": "Dallas Tigers"
+    },
+    "captain_034": {
+      "email": "Gkumar4sk@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Ganesh Kumar Sampangi",
+      "phone": "+16039329444",
+      "teamId": "team_034",
+      "teamName": "GPS"
+    },
+    "captain_035": {
+      "email": "sreejithkumark@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Vinay U",
+      "phone": "+14844478138",
+      "teamId": "team_035",
+      "teamName": "Marvida Marvels"
+    },
+    "captain_036": {
+      "email": "chinmayskrovvidi@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Chinmay krovvidi",
+      "phone": "+12144917327",
+      "teamId": "team_036",
+      "teamName": "Dig This !"
+    },
+    "captain_037": {
+      "email": "ghadialimariya@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Alifiya Janoowala/Mariya Ghadiali",
+      "phone": "+17135693346",
+      "teamId": "team_037",
+      "teamName": "Shade Throwers"
+    },
+    "captain_038": {
+      "email": "brightkingslee@gmail.com",
+      "leagueId": "pro-volleyball",
+      "name": "Kingslee",
+      "phone": "+18328078941",
+      "teamId": "team_038",
+      "teamName": "Houston Spartans"
+    },
+    "captain_039": {
+      "email": "k.femin@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Femin Kanagaraj",
+      "phone": "+16126369133",
+      "teamId": "team_039",
+      "teamName": "Volley Stars"
+    },
+    "captain_040": {
+      "email": "narrasiyon@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Bhasker",
+      "phone": "+17138205102",
+      "teamId": "team_040",
+      "teamName": "TBC"
+    },
+    "captain_041": {
+      "email": "harikareddyvatte@gmail.com",
+      "leagueId": "women-throwball",
+      "name": "Harika Katanguri",
+      "phone": "+12147993321",
+      "teamId": "team_041",
+      "teamName": "Tornados"
+    },
+    "captain_042": {
+      "email": "aloshymathew123@gmail.com",
+      "leagueId": "pro-volleyball",
+      "name": "Aloshy Mathew",
+      "phone": "+18329773704",
+      "teamId": "team_042",
+      "teamName": "Houston Challengers"
+    },
+    "captain_043": {
+      "email": "shravan.4038@gmail.com",
+      "leagueId": "regular-volleyball",
+      "name": "Trinath",
+      "phone": "+18323100722",
+      "teamId": "team_043",
+      "teamName": "JR spikers"
+    }
+  },
+  "organizers": {
+    "-OjMd84xPgsrtkPfGaZd": {
+      "addedAt": "2026-01-19T19:04:05.564Z",
+      "addedBy": "qpinme@gmail.com",
+      "email": "floodblock.me@gmail.com"
+    }
+  },
+  "teams": {
+    "team_001": {
+      "captain": {
+        "email": "reddi1211@gmail.com",
+        "name": "Sree/Karuna",
+        "phone": "+19187204253"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Cool blues"
+    },
+    "team_002": {
+      "captain": {
+        "email": "mohan.sdn@gmail.com",
+        "name": "Mohan",
+        "phone": "+15037240172"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "masters-volleyball",
+      "name": "Eternal Volleyers"
+    },
+    "team_003": {
+      "captain": {
+        "email": "poonjamalika@gmail.com",
+        "name": "Malika Poonja",
+        "phone": "+14699396215"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Dallas Rebels"
+    },
+    "team_004": {
+      "captain": {
+        "email": "swathi.kommineni3@gmail.com",
+        "name": "Swathi Kommineni",
+        "phone": "+14252137542"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Austin Challengers"
+    },
+    "team_005": {
+      "captain": {
+        "email": "gunnapanenimanikanta2000@gmail.com",
+        "name": "Hemanth Gudipudi",
+        "phone": "+15139968033"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Skywalkers"
+    },
+    "team_006": {
+      "captain": {
+        "email": "Markmeenakshi@gmail.com",
+        "name": "Meenakshi Krishan",
+        "phone": "+18577018892"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "TX Commandos"
+    },
+    "team_007": {
+      "captain": {
+        "email": "n.praneetha@gmail.com",
+        "name": "Sandhana",
+        "phone": "+18327487015"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Houston Hotshots"
+    },
+    "team_008": {
+      "captain": {
+        "email": "smani5578@gmail.com",
+        "name": "Sendil",
+        "phone": "+12147942190"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "SA Young Guns"
+    },
+    "team_009": {
+      "captain": {
+        "email": "jossyvattakuzhiyil@gmail.com",
+        "name": "Jossy Jacob",
+        "phone": "+18326008456"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "masters-volleyball",
+      "name": "Abacus Travels"
+    },
+    "team_010": {
+      "captain": {
+        "email": "raja.chitha@gmail.com",
+        "name": "Raja Jagannathan",
+        "phone": "+13463075202"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Madaki Thattu"
+    },
+    "team_011": {
+      "captain": {
+        "email": "rajanidhi@gmail.com",
+        "name": "Rajanidhi Rajasekeran",
+        "phone": "+15084966420"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Defenders"
+    },
+    "team_012": {
+      "captain": {
+        "email": "purushoth.a@gmail.com",
+        "name": "Purushothaman",
+        "phone": "+19493028420"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Indy Roots Blue"
+    },
+    "team_013": {
+      "captain": {
+        "email": "vrvinodchandar@gmail.com",
+        "name": "Vinod Chander",
+        "phone": "+919686800185"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Katy whackers 1",
+      "players": {
+        "-OjOeFHLS227Wi6eGUdT": {
+          "addedAt": "2026-01-20T04:28:11.309Z",
+          "email": "vrvinodchandar@gmail.com",
+          "lunchChoice": "nonveg",
+          "name": "Vinod Chander",
+          "phone": "+919686800185",
+          "submittedAt": "2026-01-20T04:29:09.342Z",
+          "waiverFullName": "Vinod Chandar Velayatham Ravichandran",
+          "waiverSignature": "data:image/png;base64,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",
+          "waiverSigned": true,
+          "waiverSignedAt": "2026-01-20T04:29:09.342Z",
+          "waiverSignedBy": "vrvinodchandar@gmail.com"
+        }
+      }
+    },
+    "team_014": {
+      "captain": {
+        "email": "rbalakr@gmail.com",
+        "name": "Mohan Borkar",
+        "phone": "2817366661"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "masters-volleyball",
+      "name": "Katy whackers 2",
+      "players": {
+        "-OjPUmCKmyVX2jH-vrQB": {
+          "addedAt": "2026-01-20T08:22:04.404Z",
+          "ageVerified": true,
+          "ageVerifiedAt": "2026-01-20T08:22:33.758Z",
+          "email": "rbalakr@gmail.com",
+          "lunchChoice": "nonveg",
+          "name": "Raj Balakrishnan",
+          "phone": "+18326922363",
+          "submittedAt": "2026-01-20T08:22:33.758Z",
+          "waiverFullName": "Raj Balakrishan",
+          "waiverSignature": "data:image/png;base64,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",
+          "waiverSigned": true,
+          "waiverSignedAt": "2026-01-20T08:22:33.758Z",
+          "waiverSignedBy": "rbalakr@gmail.com"
+        },
+        "-OjQq3KJJzLIwyfGCK4i": {
+          "addedAt": "2026-01-20T14:39:02.465Z",
+          "name": "Hakeem",
+          "phone": "+91 92070 13566",
+          "waiverSigned": false
+        }
+      }
+    },
+    "team_015": {
+      "captain": {
+        "email": "purushoth.a+elite@gmail.com",
+        "name": "Purushothaman",
+        "phone": "+19493028420"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "masters-volleyball",
+      "name": "Indy Roots Elite"
+    },
+    "team_016": {
+      "captain": {
+        "email": "purushoth.a+black@gmail.com",
+        "name": "Purushothaman",
+        "phone": "+19493028420"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "pro-volleyball",
+      "name": "Indy Roots Black"
+    },
+    "team_017": {
+      "captain": {
+        "email": "varshiniamirtha24@gmail.com",
+        "name": "Amirthavarshini Muraleetharan",
+        "phone": "+12177512712"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Power Strikers"
+    },
+    "team_018": {
+      "captain": {
+        "email": "r.josephcollins@gmail.com",
+        "name": "Joseph C",
+        "phone": "+17134471803"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "HTC"
+    },
+    "team_019": {
+      "captain": {
+        "email": "r.josephcollins+park8@gmail.com",
+        "name": "Joshua C",
+        "phone": "+17139929645"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Park 8"
+    },
+    "team_020": {
+      "captain": {
+        "email": "roycedxb@gmail.com",
+        "name": "Royce Samuel",
+        "phone": "+18325462909"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Houston Challengers - Blue"
+    },
+    "team_021": {
+      "captain": {
+        "email": "vijaib.singh@gmail.com",
+        "name": "Vijai singh",
+        "phone": "+19254003583"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Richmond Ravens"
+    },
+    "team_022": {
+      "captain": {
+        "email": "ramgbabu@gmail.com",
+        "name": "Ravi Venegalla",
+        "phone": "+19132207284"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Riverstone Raptors"
+    },
+    "team_023": {
+      "captain": {
+        "email": "Chandramohan3@gmail.com",
+        "name": "Chandra Govi",
+        "phone": "+13019175985"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "masters-volleyball",
+      "name": "Cutting Chai"
+    },
+    "team_024": {
+      "captain": {
+        "email": "deepak.kariyakar@gmail.com",
+        "name": "Deepak Kariyakar",
+        "phone": "+14692031967"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "masters-volleyball",
+      "name": "Mavericks"
+    },
+    "team_025": {
+      "captain": {
+        "email": "lazerjp@gmail.com",
+        "name": "Lazer Paulraj",
+        "phone": "+18324196761"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Spartan Panthers"
+    },
+    "team_026": {
+      "captain": {
+        "email": "saravanapoigaikandasamy@gmail.com",
+        "name": "Saravana Kandasamy",
+        "phone": "+13213173548"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "TSK"
+    },
+    "team_027": {
+      "captain": {
+        "email": "karthickshanmuga24@gmail.com",
+        "name": "Karthick Shanmugamoorthy",
+        "phone": "+13469551236"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Spartans Tigers"
+    },
+    "team_028": {
+      "captain": {
+        "email": "1205varsha@gmail.com",
+        "name": "Varsha",
+        "phone": "+14695628980"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Dallas divas"
+    },
+    "team_029": {
+      "captain": {
+        "email": "ysharat721@gmail.com",
+        "name": "Sharat Yempat",
+        "phone": "+18322070285"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Pumpkin Tax Warriors"
+    },
+    "team_030": {
+      "captain": {
+        "email": "sri@pumpkintaxco.com",
+        "name": "Sri Chimbli",
+        "phone": "+12144700006"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Pumpkin Tax"
+    },
+    "team_031": {
+      "captain": {
+        "email": "shanno79@icloud.com",
+        "name": "Shy N",
+        "phone": "+18328692318"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Houston Hustlers"
+    },
+    "team_032": {
+      "captain": {
+        "email": "dkonatgam@gmail.com",
+        "name": "Deepthi Konatham",
+        "phone": "+14052500525"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Team Shakthi"
+    },
+    "team_033": {
+      "captain": {
+        "email": "abckoganti@gmail.com",
+        "name": "Aravinth Mathuranayagam",
+        "phone": "+19726559369"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "pro-volleyball",
+      "name": "Dallas Tigers"
+    },
+    "team_034": {
+      "captain": {
+        "email": "Gkumar4sk@gmail.com",
+        "name": "Ganesh Kumar Sampangi",
+        "phone": "+16039329444"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "GPS"
+    },
+    "team_035": {
+      "captain": {
+        "email": "sreejithkumark@gmail.com",
+        "name": "Vinay U",
+        "phone": "+14844478138"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Marvida Marvels"
+    },
+    "team_036": {
+      "captain": {
+        "email": "chinmayskrovvidi@gmail.com",
+        "name": "Chinmay krovvidi",
+        "phone": "+12144917327"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Dig This !"
+    },
+    "team_037": {
+      "captain": {
+        "email": "ghadialimariya@gmail.com",
+        "name": "Alifiya Janoowala/Mariya Ghadiali",
+        "phone": "+17135693346"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Shade Throwers"
+    },
+    "team_038": {
+      "captain": {
+        "email": "brightkingslee@gmail.com",
+        "name": "Kingslee",
+        "phone": "+18328078941"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "pro-volleyball",
+      "name": "Houston Spartans"
+    },
+    "team_039": {
+      "captain": {
+        "email": "k.femin@gmail.com",
+        "name": "Femin Kanagaraj",
+        "phone": "+16126369133"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "Volley Stars"
+    },
+    "team_040": {
+      "captain": {
+        "email": "narrasiyon@gmail.com",
+        "name": "Bhasker",
+        "phone": "+17138205102"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "TBC"
+    },
+    "team_041": {
+      "captain": {
+        "email": "harikareddyvatte@gmail.com",
+        "name": "Harika Katanguri",
+        "phone": "+12147993321"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "women-throwball",
+      "name": "Tornados"
+    },
+    "team_042": {
+      "captain": {
+        "email": "aloshymathew123@gmail.com",
+        "name": "Aloshy Mathew",
+        "phone": "+18329773704"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "pro-volleyball",
+      "name": "Houston Challengers"
+    },
+    "team_043": {
+      "captain": {
+        "email": "shravan.4038@gmail.com",
+        "name": "Trinath",
+        "phone": "+18323100722"
+      },
+      "createdAt": "2026-01-19T12:00:00.000Z",
+      "leagueId": "regular-volleyball",
+      "name": "JR spikers"
+    }
+  },
+  "users": {
+    "3up1RtzGI6bxshJbuUjrEZVnkdS2": {
+      "email": "rbalakr@gmail.com",
+      "name": "Hakeem",
+      "role": "captain",
+      "teamId": "team_014"
+    },
+    "HMQ4A09JDHYR03qwejCFTkI2yPk2": {
+      "captainId": "captain_013",
+      "email": "vrvinodchandar@gmail.com",
+      "role": "captain",
+      "teamId": "team_013"
+    },
+    "RIZPOr5p1CU6uMjXOSbsvkJ8UZ63": {
+      "captainId": "-OjM6EtvBsaVwNTloDeX",
+      "email": "floodblock.me@gmail.com",
+      "role": "organizer",
+      "teamId": "-OjM6Ep-7Zo64Gll7zGV"
+    },
+    "wB4PgCjHF4Odi9JL6S7W2BsNXjQ2": {
+      "captainId": "-OjPG4IpXigtHm32RG8J",
+      "createdAt": "2026-01-19T15:41:01.852Z",
+      "email": "qpinme@gmail.com",
+      "role": "organizer",
+      "teamId": "-OjPGGKMY2WG0X5bszVY"
+    }
+  }
+}
