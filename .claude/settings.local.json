@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(firebase init:*)",
+      "Bash(firebase hosting:sites:list:*)",
+      "Bash(firebase hosting:channel:list:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(firebase apps:list:*)",
+      "Bash(firebase apps:sdkconfig:*)",
+      "Bash(firebase database:instances:create:*)",
+      "Bash(start https://console.firebase.google.com/project/rdtournament2026/database/data)"
+    ]
+  }
+}
