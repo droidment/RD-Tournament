@@ -780,44 +780,56 @@ async function showCaptainView() {
                             <p class="mb-2">No players added yet</p>
                             <p class="text-sm">Click "Add" to add your first player</p>
                         </div>
-                    ` : Object.entries(players).map(([playerId, player]) => `
-                        <div class="border border-gray-200 rounded-lg p-3 sm:p-4">
+                    ` : Object.entries(players).map(([playerId, player]) => {
+                        const displayEmail = player.email && player.email !== 'undefined' && player.email.trim() !== '' 
+                            ? player.email 
+                            : '📧 Not provided yet';
+                        const emailClass = player.email && player.email !== 'undefined' && player.email.trim() !== ''
+                            ? 'text-gray-600'
+                            : 'text-yellow-600 italic';
+                        
+                        return `
+                        <div class="border border-gray-200 rounded-lg p-3 sm:p-4 hover:border-blue-300 transition">
                             <div class="flex justify-between items-start gap-3">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="font-semibold text-gray-800 truncate">${player.name}</h4>
-                                    <p class="text-xs sm:text-sm text-gray-600 truncate">${player.email}</p>
+                                    <p class="text-xs sm:text-sm ${emailClass} truncate">${displayEmail}</p>
                                     <p class="text-xs sm:text-sm text-gray-600">${player.phone}</p>
                                     
                                     <div class="mt-2 sm:mt-3 flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm">
                                         <div class="flex items-center gap-1">
                                             ${player.waiverSigned ? 
-                                                '<span class="text-green-600">✓ Waiver</span>' : 
-                                                '<span class="text-red-600">✗ Waiver</span>'
+                                                '<span class="text-green-600 font-semibold">✅ Waiver</span>' : 
+                                                '<span class="text-red-600 font-semibold">❌ Waiver</span>'
                                             }
                                         </div>
                                         <div class="flex items-center gap-1">
                                             ${player.lunchChoice ? 
-                                                `<span class="text-green-600">🍽️ ${getLunchChoiceDisplay(player.lunchChoice)}</span>` : 
-                                                '<span class="text-red-600">🍽️ Pending</span>'
+                                                `<span class="text-green-600 font-semibold">🍽️ ${getLunchChoiceDisplay(player.lunchChoice)}</span>` : 
+                                                '<span class="text-orange-600 font-semibold">⏳ Lunch Pending</span>'
                                             }
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <button class="share-whatsapp bg-green-500 text-white px-3 py-1 rounded text-xs sm:text-sm hover:bg-green-600 whitespace-nowrap" data-player-id="${playerId}" data-player-name="${player.name}" data-player-phone="${player.phone}" data-player-email="${player.email}">
-                                        WhatsApp
+                                    <button class="edit-player bg-blue-500 text-white px-3 py-1 rounded text-xs sm:text-sm hover:bg-blue-600 whitespace-nowrap" data-player-id="${playerId}">
+                                        ✏️ Edit
                                     </button>
-                                    <button class="copy-link bg-blue-500 text-white px-3 py-1 rounded text-xs sm:text-sm hover:bg-blue-600 whitespace-nowrap" data-player-id="${playerId}">
-                                        Copy Link
+                                    <button class="share-whatsapp bg-green-500 text-white px-3 py-1 rounded text-xs sm:text-sm hover:bg-green-600 whitespace-nowrap" data-player-id="${playerId}" data-player-name="${player.name}" data-player-phone="${player.phone}" data-player-email="${player.email || ''}">
+                                        📱 WhatsApp
+                                    </button>
+                                    <button class="copy-link bg-gray-500 text-white px-3 py-1 rounded text-xs sm:text-sm hover:bg-gray-600 whitespace-nowrap" data-player-id="${playerId}">
+                                        🔗 Copy Link
                                     </button>
                                     <button class="remove-player bg-red-500 text-white px-3 py-1 rounded text-xs sm:text-sm hover:bg-red-600 whitespace-nowrap" data-player-id="${playerId}">
-                                        Remove
+                                        🗑️ Remove
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         </div>
@@ -891,12 +903,20 @@ async function showCaptainView() {
         });
     });
     
+    // Edit player button
+    document.querySelectorAll('.edit-player').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const playerId = e.target.dataset.playerId;
+            showEditPlayerModal(userTeamId, playerId, players[playerId]);
+        });
+    });
+    
     document.querySelectorAll('.share-whatsapp').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const playerId = e.target.dataset.playerId;
             const playerName = e.target.dataset.playerName;
             const playerPhone = e.target.dataset.playerPhone;
-            const playerEmail = e.target.dataset.playerEmail;
+            const playerEmail = e.target.dataset.playerEmail || '';
             shareViaWhatsApp(playerId, playerName, playerPhone, playerEmail, teamData.name);
         });
     });
@@ -911,11 +931,13 @@ async function showCaptainView() {
     document.querySelectorAll('.remove-player').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const playerId = e.target.dataset.playerId;
-            if (confirm('Remove this player from your team?')) {
+            const playerName = players[playerId].name;
+            if (confirm(`Remove ${playerName} from your team?`)) {
                 await removePlayer(userTeamId, playerId);
                 showCaptainView(); // Refresh view
             }
         });
+    });
     });
 }
 
@@ -974,6 +996,87 @@ function showAddPlayerModal(teamId) {
             showCaptainView(); // Refresh view
         } catch (error) {
             showToast('Error adding player: ' + error.message, 'error');
+        }
+    });
+}
+
+function showEditPlayerModal(teamId, playerId, playerData) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">✏️ Edit Player</h3>
+            
+            <form id="edit-player-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Player Name *</label>
+                    <input type="text" id="edit-player-name" value="${playerData.name}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone (WhatsApp) *</label>
+                    <input type="tel" id="edit-player-phone" value="${playerData.phone}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="+1234567890" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email (Optional)</label>
+                    <input type="email" id="edit-player-email" value="${playerData.email || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="player@example.com">
+                    <p class="text-xs text-gray-500 mt-1">Email will be collected when player signs waiver if not provided</p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" id="cancel-edit" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 font-semibold">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 font-semibold">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('cancel-edit').addEventListener('click', () => modal.remove());
+    
+    document.getElementById('edit-player-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const updatedName = document.getElementById('edit-player-name').value.trim();
+        const updatedPhone = document.getElementById('edit-player-phone').value.trim();
+        const updatedEmail = document.getElementById('edit-player-email').value.trim();
+        
+        if (!updatedName || !updatedPhone) {
+            showToast('Name and phone are required', 'error');
+            return;
+        }
+        
+        const updates = {
+            name: updatedName,
+            phone: updatedPhone
+        };
+        
+        // Only update email if provided
+        if (updatedEmail) {
+            updates.email = updatedEmail;
+        }
+        
+        try {
+            await update(ref(database, `teams/${teamId}/players/${playerId}`), updates);
+            showToast('✅ Player updated successfully!', 'success');
+            modal.remove();
+            showCaptainView(); // Refresh view
+        } catch (error) {
+            console.error('Error updating player:', error);
+            showToast('Error updating player: ' + error.message, 'error');
+        }
+    });
+    
+    // Click outside to close
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
         }
     });
 }
