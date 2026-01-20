@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Waiver PDFs stored in /waivers/{teamId}/{playerId}_{timestamp}.pdf
+    match /waivers/{teamId}/{fileName} {
+      // Allow authenticated users to upload waivers
+      allow write: if request.auth != null;
+
+      // Allow authenticated users and Cloud Functions to read waivers
+      allow read: if request.auth != null;
+    }
+
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

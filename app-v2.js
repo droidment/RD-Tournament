@@ -17,6 +17,7 @@ const WAIVER_COPY_EMAIL = "rbalakr@gmail.com";
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getDatabase, ref, set, get, push, remove, onValue, update, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getStorage, ref as storageRef, uploadBytes } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
 // ============================================
 // FIREBASE CONFIGURATION
@@ -31,7 +32,7 @@ const firebaseConfig = {
   appId: "1:363825930883:web:d8eabb507c6c3bcf0b71b6"
 };
 
-let app, auth, database;
+let app, auth, database, storage;
 let currentUser = null;
 let userRole = null;
 let userTeamId = null;
@@ -189,7 +190,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         database = getDatabase(app);
-        
+        storage = getStorage(app);
+
         // Check for player token in URL
         const urlParams = new URLSearchParams(window.location.search);
         const playerToken = urlParams.get('player');
@@ -1984,11 +1986,44 @@ Please sign and bring this form to the tournament if you prefer a paper copy.
                 
                 // Record authenticated waiver signature
                 await update(ref(database, `teams/${playerTeamId}/players/${playerId}`), playerUpdateData);
-                
+
                 showToast('Registration submitted successfully!', 'success');
+
+                // Generate and upload PDF to Firebase Storage (triggers email via Cloud Function)
+                try {
+                    showToast('Generating PDF and sending email...', 'info');
+
+                    // Generate PDF using the same function as download
+                    const pdf = generateWaiverPDF(playerData, teamData, signatureData);
+                    if (pdf) {
+                        // Convert PDF to blob
+                        const pdfBlob = pdf.output('blob');
+
+                        // Create storage path: waivers/{teamId}/{playerId}_{timestamp}.pdf
+                        const timestamp = Date.now();
+                        const fileName = `waivers/${playerTeamId}/${playerId}_${timestamp}.pdf`;
+                        const pdfStorageRef = storageRef(storage, fileName);
+
+                        // Upload PDF to Firebase Storage
+                        await uploadBytes(pdfStorageRef, pdfBlob);
+
+                        // Update database with PDF path (this triggers the Cloud Function)
+                        await update(ref(database, `teams/${playerTeamId}/players/${playerId}`), {
+                            pdfPath: fileName,
+                            pdfUploadedAt: new Date().toISOString()
+                        });
+
+                        console.log('PDF uploaded successfully to:', fileName);
+                        showToast('Email will be sent shortly!', 'success');
+                    }
+                } catch (pdfError) {
+                    console.error('Error uploading PDF:', pdfError);
+                    showToast('Waiver saved, but email may be delayed. Contact organizer if needed.', 'warning');
+                }
+
                 setTimeout(() => {
                     showPlayerView(playerId); // Refresh to show success message
-                }, 1000);
+                }, 1500);
             } catch (error) {
                 showToast('Error submitting form: ' + error.message, 'error');
             }
