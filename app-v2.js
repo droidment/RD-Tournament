@@ -468,9 +468,24 @@ function showWhatsAppBrowserError() {
 function showLoginView() {
     hideAllViews();
     document.getElementById('login-view').classList.remove('hidden');
-    
+
     document.getElementById('login-view').innerHTML = `
         <div class="max-w-md mx-auto mt-8 sm:mt-12 fade-in">
+            <!-- RESCHEDULING ANNOUNCEMENT -->
+            <div class="bg-red-600 text-white rounded-lg shadow-xl p-6 mb-6 border-4 border-red-700">
+                <h3 class="text-xl font-bold text-center mb-4">⚠️ IMPORTANT UPDATE - PLEASE READ ⚠️</h3>
+                <div class="space-y-3 text-sm">
+                    <p class="font-semibold">Hi everyone</p>
+                    <p>Due to a major winter storm in our area and keeping everyone's safety in mind, the Volleyball & Throwball Tournament scheduled for this Saturday has been rescheduled.</p>
+                    <div class="bg-white text-red-900 p-3 rounded-lg font-semibold">
+                        🗓️ The new date and updated details will be shared soon.<br>
+                        All current registrations will remain valid.
+                    </div>
+                    <p>We apologize for the inconvenience and sincerely appreciate your understanding.</p>
+                    <p class="text-center font-bold text-lg">Please stay safe and warm ❄️🙏</p>
+                </div>
+            </div>
+
             <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8">
                 <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Tournament Login</h2>
                 
@@ -855,6 +870,21 @@ async function showCaptainView() {
     
     document.getElementById('captain-view').innerHTML = `
         <div class="space-y-4 sm:space-y-6 fade-in">
+            <!-- RESCHEDULING ANNOUNCEMENT -->
+            <div class="bg-red-600 text-white rounded-lg shadow-xl p-6 border-4 border-red-700">
+                <h3 class="text-xl font-bold text-center mb-4">⚠️ IMPORTANT UPDATE - PLEASE READ ⚠️</h3>
+                <div class="space-y-3 text-sm">
+                    <p class="font-semibold">Hi everyone</p>
+                    <p>Due to a major winter storm in our area and keeping everyone's safety in mind, the Volleyball & Throwball Tournament scheduled for this Saturday has been rescheduled.</p>
+                    <div class="bg-white text-red-900 p-3 rounded-lg font-semibold">
+                        🗓️ The new date and updated details will be shared soon.<br>
+                        All current registrations will remain valid.
+                    </div>
+                    <p>We apologize for the inconvenience and sincerely appreciate your understanding.</p>
+                    <p class="text-center font-bold text-lg">Please stay safe and warm ❄️🙏</p>
+                </div>
+            </div>
+
             ${captainTeams.length > 1 ? `
                 <div class="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-lg shadow-lg p-4">
                     <div class="flex items-center justify-between gap-4">
@@ -1595,9 +1625,24 @@ async function showPlayerView(playerId) {
     }
     
     const alreadySubmitted = playerData.waiverSigned && playerData.lunchChoice;
-    
+
     document.getElementById('player-view').innerHTML = `
         <div class="max-w-2xl mx-auto fade-in">
+            <!-- RESCHEDULING ANNOUNCEMENT -->
+            <div class="bg-red-600 text-white rounded-lg shadow-xl p-6 mb-6 border-4 border-red-700">
+                <h3 class="text-xl font-bold text-center mb-4">⚠️ IMPORTANT UPDATE - PLEASE READ ⚠️</h3>
+                <div class="space-y-3 text-sm">
+                    <p class="font-semibold">Hi everyone</p>
+                    <p>Due to a major winter storm in our area and keeping everyone's safety in mind, the Volleyball & Throwball Tournament scheduled for this Saturday has been rescheduled.</p>
+                    <div class="bg-white text-red-900 p-3 rounded-lg font-semibold">
+                        🗓️ The new date and updated details will be shared soon.<br>
+                        All current registrations will remain valid.
+                    </div>
+                    <p>We apologize for the inconvenience and sincerely appreciate your understanding.</p>
+                    <p class="text-center font-bold text-lg">Please stay safe and warm ❄️🙏</p>
+                </div>
+            </div>
+
             ${alreadySubmitted ? `
                 <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center">
                     <div class="text-4xl sm:text-6xl mb-4">✓</div>
@@ -2465,6 +2510,21 @@ async function showOrganizerDashboard() {
     
     document.getElementById('organizer-view').innerHTML = `
         <div class="space-y-4 sm:space-y-6 fade-in">
+            <!-- RESCHEDULING ANNOUNCEMENT -->
+            <div class="bg-red-600 text-white rounded-lg shadow-xl p-6 border-4 border-red-700">
+                <h3 class="text-xl font-bold text-center mb-4">⚠️ IMPORTANT UPDATE - PLEASE READ ⚠️</h3>
+                <div class="space-y-3 text-sm">
+                    <p class="font-semibold">Hi everyone</p>
+                    <p>Due to a major winter storm in our area and keeping everyone's safety in mind, the Volleyball & Throwball Tournament scheduled for this Saturday has been rescheduled.</p>
+                    <div class="bg-white text-red-900 p-3 rounded-lg font-semibold">
+                        🗓️ The new date and updated details will be shared soon.<br>
+                        All current registrations will remain valid.
+                    </div>
+                    <p>We apologize for the inconvenience and sincerely appreciate your understanding.</p>
+                    <p class="text-center font-bold text-lg">Please stay safe and warm ❄️🙏</p>
+                </div>
+            </div>
+
             <!-- Header -->
             <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
