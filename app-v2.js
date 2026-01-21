@@ -3495,22 +3495,23 @@ function messageAllPlayers(teams) {
 
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Message Template:</label>
-                <textarea id="player-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-40 text-sm">Hi {name}!
+                <textarea id="player-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-48 text-sm">Hi {name}!
 
 Reminder for Republic Day Tournament 2026 🏐
 
 *Team:* {team}
 
-🔗 *Tournament App:* https://rdtournament2026.web.app
+*Step 1:* Click this link to open your registration form:
+{playerLink}
 
-*Please complete your registration ASAP:*
+*Step 2:* Complete your registration:
 ✅ Sign the liability waiver
 ✅ Select lunch preference
 
 *Tournament Date:* January 24, 2026
 
 See you at the tournament! 🎉</textarea>
-                <p class="text-xs text-gray-500 mt-1">Variables: {name}, {team}</p>
+                <p class="text-xs text-gray-500 mt-1">Variables: {name}, {team}, {playerLink}</p>
             </div>
 
             <div class="flex gap-3">
@@ -3586,9 +3587,11 @@ See you at the tournament! 🎉</textarea>
         let successCount = 0;
         selectedPlayers.forEach((player, index) => {
             setTimeout(() => {
+                const playerLink = `https://rdtournament2026.web.app/?player=${player.id}`;
                 const personalizedMessage = messageTemplate
                     .replace(/{name}/g, player.name)
-                    .replace(/{team}/g, player.team);
+                    .replace(/{team}/g, player.team)
+                    .replace(/{playerLink}/g, playerLink);
 
                 const whatsappUrl = `https://wa.me/${player.phone.replace(/\D/g, '')}?text=${encodeURIComponent(personalizedMessage)}`;
                 window.open(whatsappUrl, '_blank');
