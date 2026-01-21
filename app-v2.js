@@ -3408,10 +3408,12 @@ function updateProgressToast(toast, message) {
 function messageAllPlayers(teams) {
     const players = [];
 
-    Object.values(teams).forEach(team => {
+    Object.entries(teams).forEach(([teamId, team]) => {
         if (team.players) {
-            Object.values(team.players).forEach(player => {
+            Object.entries(team.players).forEach(([playerId, player]) => {
                 players.push({
+                    id: playerId,
+                    teamId: teamId,
                     name: player.name,
                     phone: player.phone,
                     email: player.email,
