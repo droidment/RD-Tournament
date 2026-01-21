@@ -2523,6 +2523,12 @@ async function showOrganizerDashboard() {
                     <p>We apologize for the inconvenience and sincerely appreciate your understanding.</p>
                     <p class="text-center font-bold text-lg">Please stay safe and warm ❄️🙏</p>
                 </div>
+                <div class="mt-4 flex justify-center">
+                    <button id="send-announcement-to-captains" class="bg-white text-red-700 px-6 py-3 rounded-lg hover:bg-gray-100 font-bold flex items-center gap-2 shadow-lg">
+                        <span>📢</span>
+                        <span>Send to All Captains via WhatsApp</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Header -->
@@ -2901,7 +2907,15 @@ function attachOrganizerDashboardListeners(teams, stats) {
             showSetupPage();
         });
     }
-    
+
+    // Send announcement to captains button
+    const sendAnnouncementBtn = document.getElementById('send-announcement-to-captains');
+    if (sendAnnouncementBtn) {
+        sendAnnouncementBtn.addEventListener('click', () => {
+            sendAnnouncementToCaptains(teams);
+        });
+    }
+
     // Message buttons
     const messageCaptainsBtn = document.getElementById('message-captains-btn');
     if (messageCaptainsBtn) {
@@ -3446,6 +3460,166 @@ Let's make this tournament amazing! 🎉</textarea>
         if (e.target === modal) {
             modal.remove();
         }
+    });
+}
+
+function sendAnnouncementToCaptains(teams) {
+    const captains = [];
+
+    Object.values(teams).forEach(team => {
+        captains.push({
+            name: team.captain.name,
+            phone: team.captain.phone,
+            email: team.captain.email,
+            team: team.name,
+            leagueId: team.leagueId
+        });
+    });
+
+    if (captains.length === 0) {
+        showToast('No captains to message', 'error');
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">📢 Send Announcement to Captains</h3>
+
+            <!-- Selection Controls -->
+            <div class="mb-4 flex flex-wrap gap-2">
+                <button id="select-all-announcement" class="px-4 py-2 bg-red-100 text-gray-800 rounded-lg hover:bg-red-200 text-sm font-semibold">
+                    ✅ Select All (${captains.length})
+                </button>
+                <button id="deselect-all-announcement" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm font-semibold">
+                    ❌ Deselect All
+                </button>
+                <div class="flex-1"></div>
+                <div class="px-3 py-2 bg-red-50 rounded-lg text-sm font-semibold text-red-700">
+                    Selected: <span id="selected-announcement-count">0</span>
+                </div>
+            </div>
+
+            <!-- Captain List with Checkboxes -->
+            <div class="mb-4 border border-gray-300 rounded-lg max-h-64 overflow-y-auto">
+                <div class="sticky top-0 bg-gray-50 border-b border-gray-300 p-2 text-xs font-semibold text-gray-700 grid grid-cols-12 gap-2">
+                    <div class="col-span-1 text-center">Select</div>
+                    <div class="col-span-4">Captain</div>
+                    <div class="col-span-4">Team</div>
+                    <div class="col-span-3">League</div>
+                </div>
+                ${captains.map((captain, index) => `
+                    <div class="p-2 border-b border-gray-200 hover:bg-gray-50 text-xs grid grid-cols-12 gap-2 items-center">
+                        <div class="col-span-1 text-center">
+                            <input type="checkbox" class="announcement-checkbox w-4 h-4 cursor-pointer" data-index="${index}">
+                        </div>
+                        <div class="col-span-4">
+                            <div class="font-semibold">${captain.name}</div>
+                            <div class="text-gray-500 text-xs">${captain.phone}</div>
+                        </div>
+                        <div class="col-span-4 font-medium">${captain.team}</div>
+                        <div class="col-span-3 text-gray-600 text-xs">${getLeagueName(captain.leagueId).replace(' Volleyball', '').replace(' Throwball', '')}</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <!-- Message Template -->
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Announcement Message:</label>
+                <textarea id="announcement-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-64 text-sm">⚠️ *IMPORTANT UPDATE - PLEASE READ* ⚠️
+
+Hi {name}!
+
+Due to a major winter storm in our area and keeping everyone's safety in mind, the Volleyball & Throwball Tournament scheduled for this Saturday has been rescheduled.
+
+🗓️ *The new date and updated details will be shared soon.*
+All current registrations will remain valid.
+
+We apologize for the inconvenience and sincerely appreciate your understanding.
+
+Please stay safe and warm ❄️🙏
+
+- Republic Day Tournament Organizers</textarea>
+                <p class="text-xs text-gray-500 mt-1">Variables: {name}, {team}</p>
+            </div>
+
+            <div class="flex gap-3">
+                <button class="close-modal flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-semibold">
+                    Cancel
+                </button>
+                <button id="send-announcement" class="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-semibold">
+                    📱 Send to <span id="send-announcement-count">0</span> Captains
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Update selected count
+    function updateSelectedCount() {
+        const checkboxes = modal.querySelectorAll('.announcement-checkbox:checked');
+        const count = checkboxes.length;
+        modal.querySelector('#selected-announcement-count').textContent = count;
+        modal.querySelector('#send-announcement-count').textContent = count;
+    }
+
+    // Select All
+    modal.querySelector('#select-all-announcement').addEventListener('click', () => {
+        modal.querySelectorAll('.announcement-checkbox').forEach(cb => cb.checked = true);
+        updateSelectedCount();
+    });
+
+    // Deselect All
+    modal.querySelector('#deselect-all-announcement').addEventListener('click', () => {
+        modal.querySelectorAll('.announcement-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedCount();
+    });
+
+    // Checkbox change
+    modal.querySelectorAll('.announcement-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+
+    modal.querySelector('#send-announcement').addEventListener('click', () => {
+        const messageTemplate = document.getElementById('announcement-message').value;
+        const selectedCheckboxes = modal.querySelectorAll('.announcement-checkbox:checked');
+
+        if (selectedCheckboxes.length === 0) {
+            showToast('Please select at least one captain', 'error');
+            return;
+        }
+
+        const selectedCaptains = Array.from(selectedCheckboxes).map(cb => {
+            const index = parseInt(cb.dataset.index);
+            return captains[index];
+        });
+
+        let successCount = 0;
+        selectedCaptains.forEach((captain, index) => {
+            setTimeout(() => {
+                const personalizedMessage = messageTemplate
+                    .replace(/{name}/g, captain.name)
+                    .replace(/{team}/g, captain.team);
+
+                const whatsappUrl = `https://wa.me/${captain.phone.replace(/\D/g, '')}?text=${encodeURIComponent(personalizedMessage)}`;
+                window.open(whatsappUrl, '_blank');
+                successCount++;
+
+                if (successCount === selectedCaptains.length) {
+                    showToast(`Opened WhatsApp for ${selectedCaptains.length} captains!`, 'success');
+                }
+            }, index * 1000); // 1 second delay between each
+        });
+
+        modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
     });
 }
 
