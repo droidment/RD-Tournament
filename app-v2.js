@@ -3495,11 +3495,13 @@ function messageAllPlayers(teams) {
 
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Message Template:</label>
-                <textarea id="player-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-32 text-sm">Hi {name}!
+                <textarea id="player-message" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-40 text-sm">Hi {name}!
 
 Reminder for Republic Day Tournament 2026 🏐
 
 *Team:* {team}
+
+🔗 *Tournament App:* https://rdtournament2026.web.app
 
 *Please complete your registration ASAP:*
 ✅ Sign the liability waiver
