@@ -2811,7 +2811,7 @@ This is the organizer of Republic Day Tournament 2026 🏐
 
 *IMPORTANT UPDATE for Team {team}:*
 
-🔗 *Tournament App:* https://rd-tournament.vercel.app
+🔗 *Tournament App:* https://rdtournament2026.web.app
 
 Please login using: {email}
 
@@ -3113,7 +3113,7 @@ Reminder for Republic Day Tournament 2026 🏐
 
 *Team:* {team}
 
-🔗 *App Link:* https://rd-tournament.vercel.app
+🔗 *App Link:* https://rdtournament2026.web.app
 
 *Please complete your registration ASAP:*
 ✅ Sign the liability waiver

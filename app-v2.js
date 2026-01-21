@@ -3169,7 +3169,7 @@ This is the organizer of Republic Day Tournament 2026 🏐
 
 *IMPORTANT UPDATE for Team {team}:*
 
-🔗 *Tournament App:* https://rd-tournament.vercel.app
+🔗 *Tournament App:* https://rdtournament2026.web.app
 
 Please login using: {email}
 
